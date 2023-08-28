@@ -4,14 +4,16 @@ from datetime import datetime
 from collections import OrderedDict
 
 import numpy as np
+import pandas as pd
 from pandas import read_csv, date_range, to_datetime, isna, DataFrame
 
 from utils.hydrograph import get_station_flows
+from prep.met_data import download_ghcn
 
 
 def write_basin_datafile(gage_json, data_file,
                          station_json, ghcn_data, out_csv=None, forecast=False, start='1990-01-01',
-                         units='metric', nodata_value=-9999.9):
+                         units='metric', nodata_value=-9999.9, overwrite=False):
     dt_index = date_range(start, '2021-12-31')
 
     with open(gage_json, 'r') as fp:
@@ -21,7 +23,7 @@ def write_basin_datafile(gage_json, data_file,
         if k != '06192500':
             continue
         s, e = v['start'], v['end']
-        df = get_station_flows(s, e, k)
+        df = get_station_flows(s, e, k, overwrite=overwrite)
         df.columns = ['runoff']
 
         if to_datetime(start) > to_datetime(s):
@@ -41,11 +43,18 @@ def write_basin_datafile(gage_json, data_file,
         invalid_stations = 0
 
         for k, v in stations.items():
+
             _file = os.path.join(ghcn_data, '{}.csv'.format(k))
-            df = read_csv(_file, parse_dates=True, infer_datetime_format=True)
-            df.index = to_datetime(df['DATE'])
+
+            if not os.path.exists(_file):
+                df = download_ghcn(k, _file, start)
+                if not isinstance(df, pd.DataFrame):
+                    continue
+            else:
+                df = read_csv(_file, parse_dates=True, infer_datetime_format=True, index_col=0)
 
             s = v['start']
+
             if to_datetime(start) > to_datetime(s):
                 df = df.loc[start:]
                 if df.empty or df.shape[0] < 1000:
@@ -85,10 +94,12 @@ def write_basin_datafile(gage_json, data_file,
                 continue
 
             print(k, df.shape[0])
+            df.dropna(axis=0, how='any', inplace=True)
+            df['precip'] = df[['precip']].fillna(0.0)
             stations[k]['data'] = df
 
         # sort by zone for met stations
-        input_dct = OrderedDict(sorted(stations.items(), key=lambda item: item[1]['zone']))
+        input_dct = {k: v for k, v in stations.items() if 'data' in v.keys()}
 
     else:
         input_dct = OrderedDict()
@@ -163,10 +174,5 @@ def write_basin_datafile(gage_json, data_file,
 
 
 if __name__ == '__main__':
-    gages = '/media/research/IrrigationGIS/Montana/upper_yellowstone/gsflow_prep/gages/gages.json'
-    _file = '/media/research/IrrigationGIS/Montana/upper_yellowstone/gsflow_prep/uyws_carter_5000/' \
-            'input/uyws_carter_5000_runoff.data'
-    station_js = '/media/research/IrrigationGIS/Montana/upper_yellowstone/gsflow_prep/met/selected_stations.json'
-    ghcn_ = '/media/research/IrrigationGIS/Montana/upper_yellowstone/gsflow_prep/ghcn'
-    write_basin_datafile(gages, station_json=station_js, data_file=_file, ghcn_data=ghcn_)
+    pass
 # ========================= EOF ====================================================================
