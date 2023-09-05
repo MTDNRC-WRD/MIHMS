@@ -1,21 +1,19 @@
-import os
 import json
+import os
+import warnings
 from datetime import datetime
 
 import numpy as np
-from pandas import DataFrame, date_range, read_csv
-from gsflow.prms.prms_parameter import ParameterRecord
-from gsflow.control import ControlRecord
 from gsflow.builder import builder_utils as bu
-import matplotlib
-import matplotlib.pyplot as plt
+from gsflow.control import ControlRecord
+from gsflow.prms import PrmsData
+from gsflow.prms.prms_parameter import ParameterRecord
+from pandas import DataFrame, date_range
 
-from prep.model_prep import StandardPrmsBuild, MontanaPrmsModel
 from prep.datafile import write_basin_datafile
-from utils.thredds import GridMet
+from prep.prms.standard_build import StandardPrmsBuild
 from utils.bounds import GeoBounds
-import warnings
-from gsflow.prms import PrmsData, PrmsParameters
+from utils.thredds import GridMet
 
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 
@@ -27,7 +25,7 @@ class CbhruPrmsBuild(StandardPrmsBuild):
         self.data_file = os.path.join(self.cfg.data_folder,
                                       '{}_runoff.data'.format(self.proj_name_res))
 
-    def write_datafile(self,):
+    def write_datafile(self, ):
 
         gages = self.cfg.prms_data_gages
 
@@ -307,144 +305,7 @@ class XyzDistBuild(StandardPrmsBuild):
         self.control.write(self.control_file)
 
 
-def dt_index_to_dct(dt_range):
-    dct = {}
-    time_div = ['Year', 'Month', 'day', 'hr', 'min', 'sec']
-    dct['Year'] = [i.year for i in dt_range]
-    dct['Month'] = [i.month for i in dt_range]
-    dct['day'] = [i.day for i in dt_range]
-    for t_ in time_div[3:]:
-        dct[t_] = [0 for _ in dt_range]
-    return dct
-
-
-def plot_stats(stats, file=None):
-    fig, ax = plt.subplots(figsize=(16, 6))
-    stats = stats.loc['2017-01-01': '2017-12-31']
-    ax.plot(stats.Date, stats.basin_cfs_1, color='r', linewidth=2.2, label="simulated")
-    ax.plot(stats.Date, stats.runoff_1, color='b', linewidth=1.5, label="measured")
-    ax.legend(bbox_to_anchor=(0.25, 0.65))
-    ax.set_xlabel("Date")
-    ax.set_ylabel("Streamflow, in cfs")
-    # ax.set_ylim([0, 2000])
-
-    if file:
-        plt.savefig(file)
-    else:
-        plt.show()
-
-    plt.close()
-
-
-def read_calibration(params_dir):
-    params_ = ['adjmix_rain',
-               'tmax_allsnow',
-               'srain_intcp',
-               'wrain_intcp',
-               'cecn_coef',
-               'emis_noppt',
-               'freeh2o_cap',
-               'potet_sublim',
-               'carea_max',
-               'smidx_coef',
-               'smidx_exp',
-               'fastcoef_lin',
-               'fastcoef_sq',
-               'pref_flow_den',
-               'sat_threshold',
-               'slowcoef_lin',
-               'slowcoef_sq',
-               'soil_moist_max',
-               'soil_rechr_max',
-               'soil2gw_max',
-               'ssr2gw_exp',
-               'ssr2gw_rate',
-               'transp_tmax',
-               'gwflow_coef']
-
-    dct = {k: None for k in params_}
-    l = sorted([os.path.join(params_dir, x) for x in os.listdir(params_dir)])
-    first = True
-    for i, ll in enumerate(l):
-        params = PrmsParameters.load_from_file(ll)
-        if first:
-            for p in params_:
-                vals = params.get_values(p)
-                dct[p] = vals.mean()
-            first = False
-            continue
-
-        for p in params_:
-            vals = params.get_values(p)
-            new_val = vals.mean()
-            delta = new_val - dct[p]
-            print('{:.3f} {} delta'.format(delta, p))
-            dct[p] = new_val
-            if p == 'ssr2gw_exp':
-                pass
-
-        if i == len(l) - 1:
-            print('final luca parameter values')
-            for p in params_:
-                vals = params.get_values(p)
-                new_val = vals.mean()
-                print('{:.3f} {} final values'.format(new_val, p))
-
-
-def compare_parameters(model, csv):
-
-    df = read_csv(csv)
-    df = df.mean(axis=0)
-
-    param_names = model.parameters.record_names
-
-    comp_params = [x for x in df.index if x in param_names]
-
-    for p in comp_params:
-        mp = prms.parameters.get_values(p).mean()
-        gf = df[p]
-        print('p: {}, actual: {:.3f}, geofabric: {:.3f}'.format(p, mp, gf))
-
-    pass
-
-
 if __name__ == '__main__':
-    root = '/media/research/IrrigationGIS/Montana/upper_yellowstone/gsflow_prep'
-    matplotlib.use('TkAgg')
-
-    conf = './model_files/uyws_parameters.ini'
-    project = os.path.join(root, 'uyws_carter_5000')
-    luca_dir = os.path.join(project, 'input', 'luca')
-    stdout_ = os.path.join(project, 'output', 'stdout.txt')
-    snodas = os.path.join(project, 'input', 'carter_basin_snodas.csv')
-
-    csv = '/media/research/IrrigationGIS/Montana/geospatial_fabric/prms_params_carter.csv'
-
-    prms_build = CbhruPrmsBuild(conf)
-    prms_build.build_model()
-
-    luca_params = os.path.join(luca_dir, 'calib1_round3_step2.par')
-    # read_calibration(luca_dir)
-
-    prms = MontanaPrmsModel(prms_build.control_file,
-                            prms_build.parameter_file,
-                            prms_build.data_file)
-
-    prms.run_model(stdout_)
-    stats_uncal = prms.get_statvar()
-    fig_ = os.path.join(project, 'output', 'hydrograph_uncal.png')
-    plot_stats(stats_uncal, fig_)
-
-    prms = MontanaPrmsModel(prms_build.control_file,
-                            luca_params,
-                            prms_build.data_file)
-
-    compare_parameters(prms, csv)
-
-    prms.run_model()
-    stats_cal = prms.get_statvar(snow=snodas)
-    fig_ = os.path.join(project, 'output', 'hydrograph_cal.png')
-    plot_stats(stats_cal, fig_)
     pass
 
 # ========================= EOF ====================================================================
