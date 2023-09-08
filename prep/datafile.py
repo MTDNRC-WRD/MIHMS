@@ -12,16 +12,19 @@ from prep.met_data import download_ghcn
 
 
 def write_basin_datafile(gage_json, data_file,
-                         station_json, ghcn_data, out_csv=None, forecast=False, start='1990-01-01',
-                         units='metric', nodata_value=-9999.9, overwrite=False):
-    dt_index = date_range(start, '2021-12-31')
+                         station_json, ghcn_data, out_csv=None, start='1990-01-01', end='2021-12-31',
+                         units='metric', nodata_value=-999, overwrite=False):
+
+    dt_index = date_range(start=start, end=end, tz='UTC')
 
     with open(gage_json, 'r') as fp:
         gages = json.load(fp)
 
     for k, v in gages.items():
+
         if k != '06192500':
             continue
+
         s, e = v['start'], v['end']
         df = get_station_flows(s, e, k, overwrite=overwrite)
         df.columns = ['runoff']
@@ -44,6 +47,9 @@ def write_basin_datafile(gage_json, data_file,
 
         for k, v in stations.items():
 
+            if k != 'USC00241995':
+                continue
+
             _file = os.path.join(ghcn_data, '{}.csv'.format(k))
 
             if not os.path.exists(_file):
@@ -52,6 +58,7 @@ def write_basin_datafile(gage_json, data_file,
                     continue
             else:
                 df = read_csv(_file, parse_dates=True, infer_datetime_format=True, index_col=0)
+                df.index = pd.DatetimeIndex(df.index, tz='UTC')
 
             s = v['start']
 
