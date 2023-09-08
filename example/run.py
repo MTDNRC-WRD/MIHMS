@@ -29,22 +29,24 @@ def build_data(config, overwrite=False):
                       out_json=cfg.prms_data_stations)
 
     write_basin_datafile(cfg.prms_data_gages, station_json=cfg.prms_data_stations,
-                         data_file=prms_build.data_file, ghcn_data=cfg.prms_data_ghcn)
+                         data_file=prms_build.data_file, ghcn_data=cfg.prms_data_ghcn,
+                         start=prms_build.cfg.start_time, end=prms_build.cfg.end_time)
 
 
-def run_model(config):
-    root = '/media/research/IrrigationGIS/Montana/upper_yellowstone/gsflow_prep'
-    matplotlib.use('TkAgg')
+def run_model(root, config):
 
-    project = os.path.join(root, 'uyws_carter_5000')
+    prms_build = CbhruPrmsBuild(config)
+    prms_build.build_model()
+
+    data = os.path.join(root, 'data')
+    # matplotlib.use('TkAgg')
+
+    project = os.path.join(data, 'uyws_carter_{}'.format(prms_build.cfg.hru_cellsize))
     luca_dir = os.path.join(project, 'input', 'luca')
     stdout_ = os.path.join(project, 'output', 'stdout.txt')
     snodas = os.path.join(project, 'input', 'carter_basin_snodas.csv')
 
-    csv = '/media/research/IrrigationGIS/Montana/geospatial_fabric/prms_params_carter.csv'
-
-    prms_build = CbhruPrmsBuild(config)
-    prms_build.build_model()
+    csv = os.path.join(data, 'prms_params_carter.csv')
 
     luca_params = os.path.join(luca_dir, 'calib1_round3_step2.par')
     # read_calibration(luca_dir)
@@ -54,6 +56,7 @@ def run_model(config):
                             prms_build.data_file)
 
     prms.run_model(stdout_)
+
     stats_uncal = prms.get_statvar()
     fig_ = os.path.join(project, 'output', 'hydrograph_uncal.png')
     plot_stats(stats_uncal, fig_)
@@ -68,6 +71,25 @@ def run_model(config):
     stats_cal = prms.get_statvar(snow=snodas)
     fig_ = os.path.join(project, 'output', 'hydrograph_cal.png')
     plot_stats(stats_cal, fig_)
+
+
+def run_sagehen():
+
+    ws = '/media/research/IrrigationGIS/software/prms5.2.0_linux/projects/sagehen'
+
+    control_file = os.path.join(ws, 'control', 'sagehen.control')
+    parameter_file = os.path.join(ws, 'input', 'sagehen.params')
+    data_file = os.path.join(ws, 'input', 'sagehen.data')
+
+    stdout_ = os.path.join(ws, 'output', 'stdout.txt')
+
+    prms = MontanaPrmsModel(control_file,
+                            parameter_file,
+                            data_file)
+
+    prms.run_model(stdout_)
+
+    pass
 
 
 def compare_parameters(model, csv):
@@ -87,7 +109,11 @@ def compare_parameters(model, csv):
 
 
 if __name__ == '__main__':
-    conf = '../models/uyws_parameters.ini'
-    # build_data(conf, overwrite=False)
-    run_model(conf)
+
+    wspace = os.path.dirname(os.path.abspath(__file__))
+    conf = os.path.join(wspace, 'uyws_parameters.ini')
+
+    build_data(conf, overwrite=True)
+    run_model(wspace, conf)
+    # run_sagehen()
 # ========================= EOF ====================================================================
