@@ -25,7 +25,7 @@ class CbhruPrmsBuild(StandardPrmsBuild):
         self.data_file = os.path.join(self.cfg.data_folder,
                                       '{}_runoff.data'.format(self.proj_name_res))
 
-    def write_datafile(self, ):
+    def write_datafile(self):
 
         gages = self.cfg.prms_data_gages
 
@@ -40,7 +40,8 @@ class CbhruPrmsBuild(StandardPrmsBuild):
 
         if not os.path.isfile(self.data_file):
             units = 'metric' if self.cfg.runoff_units == 1 else 'standard'
-            write_basin_datafile(gages, self.data_file, units=units)
+            write_basin_datafile(gages, self.data_file, station_json=self.cfg.prms_data_stations,
+                                 units=units, ghcn_data=self.cfg.prms_data_ghcn)
 
         self.data = PrmsData.load_from_file(self.data_file)
 

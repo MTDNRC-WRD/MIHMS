@@ -1,4 +1,6 @@
 import json
+
+import pandas as pd
 from datetime import datetime
 from collections import OrderedDict
 
@@ -29,9 +31,10 @@ def download_ghcn(station_id, file_dst, start):
     df = df[target_cols]
 
     # pd.to_datetime returns all 1970-01-01 on 'DATE'
-    df.index = [datetime.strptime(str(d), '%Y%m%d') for d in df.index]
+    dt_ind = pd.DatetimeIndex([datetime.strptime(str(d), '%Y%m%d') for d in df.index], tz='UTC')
+    df.index = dt_ind
 
-    if df.index[-1] < to_datetime(start):
+    if df.index[-1] < to_datetime(start, utc=True):
         print('records end before study period')
         return None
 
