@@ -79,6 +79,9 @@ class MontanaPrmsModel(HydroModel):
         df.drop(columns=['Hour', 'Minute', 'Second'], inplace=True)
 
         # cms to m3 per day
+        if self.control.get_record('runoff_units').values[0] == 1:
+            df['runoff_1'] = df['runoff_1'] / 0.028317
+
         df['obs_q_vol_m3'] = 60 * 60 * 24 * df['runoff_1'] / 1e6
         df['pred_q_vol_m3'] = 60 * 60 * 24 * df['basin_cms_1'] / 1e6
 

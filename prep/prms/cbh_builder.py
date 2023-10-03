@@ -99,7 +99,12 @@ class CbhruPrmsBuild(StandardPrmsBuild):
             if var_ in ['tmmn', 'tmmx']:
                 vals = np.where(vals > 0, vals - 273.15, np.zeros_like(vals))
                 vals = (vals * 9 / 5) + 32.
+
+                # TODO: somehow allowing temps > ~95 leads to an error where
+                # PRMS finds a temp exceeding MAXTEMP (200.0; see src/prms/prms_constants.f90)
+                # vals = np.where(vals > 120.0, np.ones_like(vals) * 105., vals)
                 vals = np.where(vals > 90.0, np.ones_like(vals) * 90., vals)
+
                 vals = np.where(vals < -40.0, np.ones_like(vals) * -40., vals)
                 unit_name = 'F'
 
@@ -179,6 +184,10 @@ class CbhruPrmsBuild(StandardPrmsBuild):
                                                 dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
                                                 datatype=2))
 
+        self.data_params.append(ParameterRecord('elev_units', [self.cfg.elev_units], datatype=4))
+        self.data_params.append(ParameterRecord('precip_units', [self.cfg.precip_units], datatype=4))
+        self.data_params.append(ParameterRecord('temp_units', [self.cfg.temp_units], datatype=4))
+
         [self.parameters.add_record_object(rec) for rec in self.data_params]
 
         self.parameters.write(self.parameter_file)
@@ -187,6 +196,7 @@ class CbhruPrmsBuild(StandardPrmsBuild):
         self.control.add_record('elev_units', [self.cfg.elev_units])
         self.control.add_record('precip_units', [self.cfg.precip_units])
         self.control.add_record('temp_units', [self.cfg.temp_units])
+
         self.control.add_record('runoff_units', [self.cfg.runoff_units])
 
         self.control.add_record('orad_flag', [0])

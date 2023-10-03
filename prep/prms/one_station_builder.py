@@ -21,12 +21,12 @@ from prep.prms import NOT_NEEDED_XYZ
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 
 
-class XyzDistBuild(StandardPrmsBuild):
+class SingleStationBuild(StandardPrmsBuild):
 
     def __init__(self, config):
         StandardPrmsBuild.__init__(self, config)
         self.data_file = os.path.join(self.cfg.data_folder,
-                                      '{}_xyz.data'.format(self.proj_name_res))
+                                      '{}_1sta.data'.format(self.proj_name_res))
 
     def write_datafile(self):
 
@@ -45,21 +45,20 @@ class XyzDistBuild(StandardPrmsBuild):
         with open(stations, 'r') as js:
             stations = json.load(js)
 
-        if self.cfg.selected_stations:
-            stations = {k: stations[k] for k in self.cfg.selected_stations}
-        if self.cfg.selected_gage:
-            gages = {self.cfg.selected_gage: gages[self.cfg.selected_gage]}
+        station = self.cfg.selected_stations[0]
+        stations = {station: stations[station]}
+
+        gages = {self.cfg.selected_gage: gages[self.cfg.selected_gage]}
 
         units = 'metric' if self.cfg.precip_units == '1' else 'standard'
-        new_stations = write_basin_datafile(gages=gages, data_file=self.data_file, stations=stations,
-                                            ghcn_data=ghcn, out_csv=None, units=units, return_modified=True)
-        stations = {k: v for k, v in stations.items() if k in new_stations.keys()}
+        write_basin_datafile(gages=gages, data_file=self.data_file, stations=stations,
+                             ghcn_data=ghcn, out_csv=None, units=units)
 
         sta_iter = sorted([(v['zone'], v) for k, v in stations.items()], key=lambda x: x[0])
         tsta_elev, tsta_nuse, tsta_x, tsta_y, psta_elev = [], [], [], [], []
         for _, val in sta_iter:
 
-            if self.cfg.elev_units == '1':
+            if self.cfg.elev_units == 1:
                 elev = val['elev'] / 0.3048
             else:
                 elev = val['elev']
@@ -70,17 +69,8 @@ class XyzDistBuild(StandardPrmsBuild):
             tsta_y.append(val['proj_coords'][0])
             psta_elev.append(elev)
 
-        self.data_params = [ParameterRecord('nrain', values=[len(tsta_x)], datatype=1),
-
-                            ParameterRecord('ntemp', values=[len(tsta_x)], datatype=1),
-
-                            ParameterRecord('psta_elev', np.array(psta_elev, dtype=float).ravel(),
+        self.data_params = [ParameterRecord('psta_elev', np.array(psta_elev, dtype=float).ravel(),
                                             dimensions=[['nrain', len(psta_elev)]], datatype=2),
-
-                            ParameterRecord('psta_nuse', np.array(tsta_nuse, dtype=int).ravel(),
-                                            dimensions=[['nrain', len(tsta_nuse)]], datatype=1),
-
-                            # ParameterRecord(name='ndist_psta', values=[len(tsta_nuse), ], datatype=1),
 
                             ParameterRecord('psta_x', np.array(tsta_x, dtype=float).ravel(),
                                             dimensions=[['nrain', len(tsta_x)]], datatype=2),
@@ -91,16 +81,13 @@ class XyzDistBuild(StandardPrmsBuild):
                             ParameterRecord('tsta_elev', np.array(tsta_elev, dtype=float).ravel(),
                                             dimensions=[['ntemp', len(tsta_elev)]], datatype=2),
 
-                            ParameterRecord('tsta_nuse', np.array(tsta_nuse, dtype=int).ravel(),
-                                            dimensions=[['ntemp', len(tsta_nuse)]], datatype=1),
-
-                            ParameterRecord(name='ndist_tsta', values=[len(tsta_nuse), ], datatype=1),
-
                             ParameterRecord('tsta_x', np.array(tsta_x, dtype=float).ravel(),
                                             dimensions=[['ntemp', len(tsta_x)]], datatype=2),
 
                             ParameterRecord('tsta_y', np.array(tsta_y, dtype=float).ravel(),
                                             dimensions=[['ntemp', len(tsta_y)]], datatype=2),
+
+                            ParameterRecord(name='max_missing', values=[9, ], datatype=1),
 
                             bu.tmax_adj(self.nhru),
 
@@ -140,21 +127,19 @@ class XyzDistBuild(StandardPrmsBuild):
         if self.data_params is not None:
             [self.parameters.add_record_object(rec) for rec in self.data_params]
 
-        for p in NOT_NEEDED_XYZ:
-            self.parameters.remove_record(p)
+
 
         self.parameters.write(self.parameter_file)
 
     def write_control(self):
-        # 0: standard; 1: SI/metric
 
         self.control.add_record('elev_units', [self.parameters.elev_units.values[0]])
         self.control.add_record('precip_units', [self.parameters.precip_units.values[0]])
         self.control.add_record('temp_units', [self.parameters.temp_units.values[0]])
         self.control.add_record('runoff_units', [int(self.cfg.runoff_units)])
 
-        self.control.precip_module = ['xyz_dist']
-        self.control.temp_module = ['xyz_dist']
+        self.control.precip_module = ['precip_1sta']
+        self.control.temp_module = ['temp_1sta']
         self.control.et_module = ['potet_jh']
         self.control.solrad_module = ['ccsolrad']
 

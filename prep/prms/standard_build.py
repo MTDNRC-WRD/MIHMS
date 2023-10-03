@@ -5,6 +5,7 @@ import time
 
 import numpy as np
 import pandas as pd
+import pyproj
 from pyproj import Transformer
 import rasterio
 import fiona
@@ -12,6 +13,7 @@ from affine import Affine
 from shapely.geometry import shape
 from scipy.ndimage.morphology import binary_erosion
 from pandas.plotting import register_matplotlib_converters
+import geopandas as gpd
 
 import flopy
 from flopy.utils import GridIntersect
@@ -44,6 +46,7 @@ class StandardPrmsBuild:
 
         self.cfg = PRMSConfig(config)
         self.res = float(self.cfg.hru_cellsize)
+        self.crs, self.epsg = pyproj.CRS.from_epsg(5071), 5071
         self.proj_name_res = '{}_{}'.format(self.cfg.project_name,
                                             self.cfg.hru_cellsize)
 
@@ -56,6 +59,7 @@ class StandardPrmsBuild:
         self.parameters = None
         self.control = None
         self.data = None
+
         self.data_params = []
         self.control_records = []
 
@@ -73,6 +77,8 @@ class StandardPrmsBuild:
                                            '{}.params'.format(self.proj_name_res))
 
         self.data_file = os.path.join(self.cfg.data_folder, '{}.data'.format(self.proj_name_res))
+
+        self.domain_shapefile = os.path.join(self.cfg.hru_folder, 'model_domain_build.shp')
 
     def build_parameters(self):
 
@@ -259,7 +265,7 @@ class StandardPrmsBuild:
         y = self.modelgrid.ycellcenters.ravel()
         self.nhru = (x * y).size
         self.hru_area = (float(self.cfg.hru_cellsize) ** 2) * 0.000247105  # acres
-        trans = Transformer.from_proj('epsg:{}'.format(5071), 'epsg:4326', always_xy=True)
+        trans = Transformer.from_proj('epsg:{}'.format(self.epsg), 'epsg:4326', always_xy=True)
         self.lon, self.lat = trans.transform(x, y)
 
         self.zeros = np.zeros((self.modelgrid.nrow, self.modelgrid.ncol))
@@ -585,6 +591,18 @@ class StandardPrmsBuild:
         self.pour_pt_coords = [[self.modelgrid.xcellcenters[rc[0], rc[1]],
                                 self.modelgrid.ycellcenters[rc[0], rc[1]]]]
         return shed
+
+    def write_build_shapefile(self):
+
+        params = ['elevation']
+        fishnet = gpd.read_file(self.fishnet_file)
+        domain = deepcopy(fishnet)
+        domain['HRU_ID'] = domain['node']
+        domain = domain[['HRU_ID', 'geometry']]
+        for p in params:
+            data = getattr(self, p).ravel()
+            domain[p] = data
+        domain.to_file(self.domain_shapefile, crs=self.crs)
 
 
 def features(shp):

@@ -1,10 +1,11 @@
 import os
 
-import matplotlib
 import pandas as pd
 
 from models.models import MontanaPrmsModel
-from prep.prms.model_builders import CbhruPrmsBuild
+from prep.prms.cbh_builder import CbhruPrmsBuild
+from prep.prms.xyz_builder import XyzDistBuild
+from prep.prms.one_station_builder import SingleStationBuild
 from prep.datafile import write_basin_datafile
 from prep.flow_gages import get_gage_stations
 from prep.met_data import get_ghcn_stations
@@ -35,7 +36,7 @@ def build_data(config, overwrite=False):
 
 def run_model(root, config):
 
-    prms_build = CbhruPrmsBuild(config)
+    prms_build = XyzDistBuild(config)
     prms_build.build_model()
 
     data = os.path.join(root, 'data')
@@ -54,42 +55,24 @@ def run_model(root, config):
     prms = MontanaPrmsModel(prms_build.control_file,
                             prms_build.parameter_file,
                             prms_build.data_file)
-
+    #
+    param_dict = {rn: prms.parameters.get_values(rn) for rn in prms.parameters.record_names}
     prms.run_model(stdout_)
 
     stats_uncal = prms.get_statvar()
     fig_ = os.path.join(project, 'output', 'hydrograph_uncal.png')
     plot_stats(stats_uncal, fig_)
 
-    prms = MontanaPrmsModel(prms_build.control_file,
-                            luca_params,
-                            prms_build.data_file)
+    # prms = MontanaPrmsModel(prms_build.control_file,
+    #                         luca_params,
+    #                         prms_build.data_file)
 
-    compare_parameters(prms, csv)
+    # compare_parameters(prms, csv)
 
-    prms.run_model()
-    stats_cal = prms.get_statvar(snow=snodas)
-    fig_ = os.path.join(project, 'output', 'hydrograph_cal.png')
-    plot_stats(stats_cal, fig_)
-
-
-def run_sagehen():
-
-    ws = '/media/research/IrrigationGIS/software/prms5.2.0_linux/projects/sagehen'
-
-    control_file = os.path.join(ws, 'control', 'sagehen.control')
-    parameter_file = os.path.join(ws, 'input', 'sagehen.params')
-    data_file = os.path.join(ws, 'input', 'sagehen.data')
-
-    stdout_ = os.path.join(ws, 'output', 'stdout.txt')
-
-    prms = MontanaPrmsModel(control_file,
-                            parameter_file,
-                            data_file)
-
-    prms.run_model(stdout_)
-
-    pass
+    # prms.run_model()
+    # stats_cal = prms.get_statvar()
+    # fig_ = os.path.join(project, 'output', 'hydrograph_cal.png')
+    # plot_stats(stats_cal, fig_)
 
 
 def compare_parameters(model, csv):
@@ -111,9 +94,8 @@ def compare_parameters(model, csv):
 if __name__ == '__main__':
 
     wspace = os.path.dirname(os.path.abspath(__file__))
-    conf = os.path.join(wspace, 'uyws_parameters.ini')
+    conf = os.path.join(wspace, 'uyws_parameters.toml')
 
-    build_data(conf, overwrite=True)
+    # build_data(conf, overwrite=True)
     run_model(wspace, conf)
-    # run_sagehen()
 # ========================= EOF ====================================================================

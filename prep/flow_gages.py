@@ -25,7 +25,7 @@ def get_gage_stations(basin_shp, gages_shp, out_json):
             s, e = f['properties']['start'], f['properties']['end']
             elev = elevation_from_coordinate(f['properties']['LAT'], f['properties']['LON'])
             print(sta, elev)
-            sleep(2)
+            # sleep(2)
 
             stations[sta] = {'start': s, 'end': e,
                              'lat': f['properties']['LAT'],

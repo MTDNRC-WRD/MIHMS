@@ -3,7 +3,7 @@
 
 # Installation
  
- Use conda to install gdal and netcdf4, then run pip install -r requirements.txt
+ Use conda to install some choice high-level packages, then run pip install -r requirements.txt
 
  # conda create -n mihm python=3.9
  # conda activate mihm

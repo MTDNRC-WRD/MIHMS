@@ -90,7 +90,7 @@ def get_ghcn_stations(basin_shp, ghcn_shp, snotel_shp, out_json, buffer=10):
         dst.write(json.dumps(stations))
 
 
-def met_zones_geometries(station_meta, hru, zones_out, out_stations):
+def met_zones_geometries(station_meta, hru, out_stations, zones_out=None):
     """Select 'spread out' meteorology stations (in 3 dimensions, using K means clustering),
     by selecting long-period stations near the center of each cluster,
     collect and assign the nearest HUC 12 basins to each station,
@@ -131,7 +131,7 @@ def met_zones_geometries(station_meta, hru, zones_out, out_stations):
             idx.insert(_id, shape(f['geometry']).bounds)
             hru_cent = shape(f['geometry']).centroid
             x, y = normx(hru_cent.x), normy(hru_cent.y)
-            z = normz(f['properties']['HRU_ID'])
+            z = normz(f['properties']['elevation'])
             norm_center = Point(x, y, z)
             dist = [norm_center.distance(mnc[1]) for mnc in met_norm_coords]
             dist_idx = dist.index(min(dist))
@@ -141,7 +141,12 @@ def met_zones_geometries(station_meta, hru, zones_out, out_stations):
     for k, v in met.items():
         pt = Point(v[pj][1], v[pj][0])
         buf_pt = pt.buffer(1).bounds
-        hru = [x for x in idx.intersection(buf_pt)][0]
+        inter = [x for x in idx.intersection(buf_pt)]
+
+        try:
+            hru = inter[0]
+        except IndexError:
+            continue
 
         zone = v['zone']
 
@@ -169,7 +174,7 @@ def met_zones_geometries(station_meta, hru, zones_out, out_stations):
 
     with open(out_stations, 'w') as dst:
         print('write {}'.format(out_stations))
-        dst.write(json.dumps(met))
+        json.dump(met, dst, indent=4)
 
     station_shp_file = out_stations.replace('.json', '.shp')
     meta['schema']['geometry'] = 'Point'
@@ -217,7 +222,7 @@ def calculate_monthly_lapse_rates(csv, station_meta):
 
 
 def attribute_precip_zones(ppt_zones_shp, csv, out_shp):
-    """Write collected met data (created during datafile prep) mean precipitation data to precipitation zones
+    """Write collected met data (created during datafile prep) summary to precipitation zones
     shapefile."""
     mdf = read_csv(csv, sep=' ', infer_datetime_format=True, index_col=0, parse_dates=True)
 
