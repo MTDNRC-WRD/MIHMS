@@ -1,12 +1,12 @@
 # PRMS Parameter Generator Inputs
 [MODEL_INFO]
 project_folder = "/home/dgketchum/PycharmProjects/MIHMS/example/data"
-project_name = "uyws_carter"
+project_name = "smith"
 hru_cellsize = 3000
 
 # Simulation Period yyyy/mm/dd
-start_time = "2016-10-01"
-end_time = "2017-12-31"
+start_time = "1990-10-01"
+end_time = "2021-12-31"
 
 # Units: Note that MANY module-specific parameters are hard-coded.
 # The units for .day files used in CBhru, for example, are hard-coded.
@@ -18,48 +18,38 @@ precip_units = 1
 temp_units = 1
 runoff_units = 1
 
-gage_choicee = "06192500"
-# selected_stations = "USC00243378"
-# selected_stations = ["USC00245080", "USC00243378"]
-selected_stations = false
+gage_choice = "06076690"
 
 # prms_exe = "/media/research/IrrigationGIS/software/prms5.2.0_linux/bin/prms"
 prms_exe = "/home/dgketchum/prms_5.2.1_linux/bin/prms"
 gdal_warp_exe = "/home/dgketchum/miniconda3/envs/opnt/bin/gdalwarp"
 source_rasters = "/media/research/IrrigationGIS/Montana/statewide_rasters"
 
+
 [INPUT_PATHS]
 #### Following paths relative to 'project_folder' above #####
 
-# Study Area
-study_area_path = "domain/carter_basin.shp"
-
-# Model outlet point
-model_outlet_path = "domain/carter_gage.shp"
-
-usgs_gages = "gages/usgs_gages_30yr.shp"
-ghcn_stations = "ghcn/ghcn_stations_pnw.shp"
-snotel_stations = "snotel/snotel_stations.shp"
-
-
-# if stations xyz dist
-prms_stations_shp = "met/selected_stations.shp"
-
-## Remap Files
 remap_folder = "remaps"
 
-# Data file information
-prms_data_stations = "met/selected_stations.json"
-prms_data_zones = "met/precip_zones.shp"
+usgs_gages = "gages/usgs_gages_wELEV_30yr.shp"
+ghcn_stations = "met/ghcn/ghcn_stations_pnw.shp"
+snotel_stations = "met/snotel/snotel_stations.shp"
 
 [MODEL_PATHS]
 #### Following paths relative to 'project_folder/{project_name}_{hru_cellsize}' above #####
-## PRMS Control/Data/Parameter
-parameter_folder = "input"
-control_folder = "control"
-data_folder = "input"
-output_folder = "output"
-hru_folder = "hru_params"
+
+# Study Area
+study_area_path = "domain/smith_basin.shp"
+
+# Model outlet point
+model_outlet_path = "domain/smith_gage.shp"
+
+# Stations to use
+selected_stations = "domain/selected_stations.shp"
+prms_data_stations = "domain/prms_data_stations.json"
+met_zones = "domain/met_zones.shp"
+
+#lake_path = ''
 
 # Rasters
 raster_folder = "rasters"
@@ -73,7 +63,9 @@ sand = "rasters/sand.tif"
 loam = "rasters/loam.tif"
 nlcd = "rasters/nlcd.tif"
 
-
-lake_path = "nhd/uyws_lakes.shp"
-
-# Data file information
+## PRMS Control/Data/Parameter
+parameter_folder = "input"
+control_folder = "control"
+data_folder = "input"
+output_folder = "output"
+hru_folder = "hru_params"
