@@ -32,8 +32,15 @@ class PRMSConfig:
 
         # Prepend 'project_folder' to paths in 'INPUT_PATHS'
         project_folder = self.__dict__.get('project_folder', '')
+        project_name = self.__dict__.get('project_name', '')
+        hru_cellsize = self.__dict__.get('hru_cellsize', '')
+        model_folder = '{}_{}'.format(project_name, str(hru_cellsize))
+
         for key, value in input_paths.items():
-            self.__dict__[key] = os.path.join(project_folder, value)
+            self.__dict__[key] =os.path.join(project_folder, value)
+
+        for key, value in model_paths.items():
+            self.__dict__[key] = os.path.join(project_folder, model_folder, value)
 
 
 if __name__ == '__main__':
