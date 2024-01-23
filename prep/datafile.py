@@ -8,6 +8,8 @@ import pandas as pd
 from pandas import read_csv, date_range, to_datetime, isna, DataFrame
 
 from utils.hydrograph import get_station_flows
+from utils.gridmet import gridmet_infill
+
 from prep.met_data import download_ghcn
 
 
@@ -31,8 +33,8 @@ def write_basin_datafile(gages, data_file,
 
         df = df.reindex(dt_index)
 
-        if units == 'metric':
-            df = df * 0.0283168
+        if units != 'metric':
+            df = df * 35.3146
 
         v['data'] = df
 
@@ -56,7 +58,7 @@ def write_basin_datafile(gages, data_file,
             df = read_csv(_file, parse_dates=True, infer_datetime_format=True, index_col=0)
             df.index = pd.DatetimeIndex(df.index, tz='UTC')
 
-        s = v['start']
+        s = v['START']
 
         if to_datetime(start) > to_datetime(s):
             df = df.loc[start:]
@@ -94,6 +96,14 @@ def write_basin_datafile(gages, data_file,
             if df.empty or df.shape[0] < 1000:
                 print(k, 'insuf records in date range')
                 invalid_stations += 1
+
+            nan_ct, size = np.count_nonzero(np.isnan(df.values)), df.values.size
+            # if nan_ct / size > 0.15:
+            #     print('ERROR: missing {} of {} values, consider another station'.format(nan_ct, size))
+
+            if nan_ct / size > 0.05:
+                print('WARNING: missing {} of {} values, filling with gridmet'.format(nan_ct, size))
+                df = gridmet_infill(df, lat=v['LAT'], lon=v['LON'], *['tmax', 'tmin', 'precip'], units=units)
 
         except KeyError as e:
             print(k, 'incomplete', e)
@@ -151,11 +161,11 @@ def write_basin_datafile(gages, data_file,
 
                 if var in d.columns:
                     line_ = ' '.join(['// ', k.rjust(11, '0'),
-                                      v['name'].ljust(40, ' ')[:40],
+                                      v['STANAME'].ljust(40, ' ')[:40],
                                       var,
-                                      '{:.3f}'.format(v['lat']),
-                                      '{:.3f}'.format(v['lon']),
-                                      '{:.1f}'.format(v['elev']),
+                                      '{:.3f}'.format(float(v['LAT'])),
+                                      '{:.3f}'.format(float(v['LON'])),
+                                      '{:.1f}'.format(float(v['ELEV'])),
                                       unit]) + '\n'
                     f.write(line_)
                     df['{}_{}'.format(k, var)] = d[var]
@@ -168,6 +178,7 @@ def write_basin_datafile(gages, data_file,
 
         df[isna(df)] = nodata_value
 
+        csv_ = df.copy()
         df = df.round(2)
         df = df.astype(str)
         # df = df.replace('-999.00', '-999', regex=True)
@@ -175,10 +186,10 @@ def write_basin_datafile(gages, data_file,
 
         if out_csv:
             #  save dataframe to normal csv for use elsewhere
-            df = df[[c for c in df.columns if c not in time_div]]
-            df['date'] = df.index
-            df[df.values == nodata_value] = np.nan
-            df.to_csv(out_csv, sep=' ', float_format='%.2f')
+            csv_ = csv_[[c for c in csv_.columns if c not in time_div]]
+            csv_['date'] = csv_.index
+            csv_[csv_.values == nodata_value] = np.nan
+            csv_.to_csv(out_csv, index=0)
 
     if return_modified:
         input_dct = {k: v for k, v in input_dct.items() if k not in dropped}
