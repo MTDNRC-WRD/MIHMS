@@ -5,6 +5,7 @@ from datetime import datetime
 from collections import OrderedDict
 
 import fiona
+import geopandas as gpd
 import numpy as np
 from pandas import read_csv, date_range, to_datetime
 from rtree import index
@@ -90,7 +91,7 @@ def get_ghcn_stations(basin_shp, ghcn_shp, snotel_shp, out_json, buffer=10):
         dst.write(json.dumps(stations))
 
 
-def met_zones_geometries(station_meta, hru, out_stations, zones_out=None):
+def met_zones_geometries(station_meta, hru, out_stations, zones_out=None, mask=None):
     """Select 'spread out' meteorology stations (in 3 dimensions, using K means clustering),
     by selecting long-period stations near the center of each cluster,
     collect and assign the nearest HUC 12 basins to each station,
@@ -98,14 +99,14 @@ def met_zones_geometries(station_meta, hru, out_stations, zones_out=None):
     Finally, build the attribute table and write both selected stations (json, shp) and precipitation zones (shp).
     """
 
-    with open(station_meta, 'r') as js:
-        stations = json.load(js)
+    stations = gpd.read_file(station_meta, mask=mask)
+    stations.index = stations['STAID']
+    stations = stations.to_dict(orient='index')
 
-    met = {k: v for k, v in stations.items() if int(v['start'][:4]) < 1991 and int(v['end'][:4]) > 2020}
+    met = {k: v for k, v in stations.items() if int(v['START'][:4]) < 1991 and int(v['END'][:4]) > 2020}
 
-    pj = 'proj_coords'
     xx, yy, zz, s_ids = [], [], [], []
-    [(xx.append(v[pj][1]), yy.append(v[pj][0]), zz.append(v['elev']), s_ids.append(k)) for k, v in met.items()]
+    [(xx.append(v['geometry'].x), yy.append(v['geometry'].y), zz.append(v['ELEV']), s_ids.append(k)) for k, v in met.items()]
     x_min, x_max, y_min, y_max, z_min, z_max = min(xx), max(xx), min(yy), max(yy), min(zz), max(zz)
 
     def normx(x):
@@ -139,7 +140,7 @@ def met_zones_geometries(station_meta, hru, out_stations, zones_out=None):
 
     ppt_zones = {}
     for k, v in met.items():
-        pt = Point(v[pj][1], v[pj][0])
+        pt = v['geometry']
         buf_pt = pt.buffer(1).bounds
         inter = [x for x in idx.intersection(buf_pt)]
 
@@ -172,25 +173,9 @@ def met_zones_geometries(station_meta, hru, out_stations, zones_out=None):
         for k, v in ppt_zones.items():
             dst.write(v)
 
-    with open(out_stations, 'w') as dst:
-        print('write {}'.format(out_stations))
-        json.dump(met, dst, indent=4)
-
-    station_shp_file = out_stations.replace('.json', '.shp')
-    meta['schema']['geometry'] = 'Point'
-
-    with fiona.open(station_shp_file, 'w', **meta) as dst:
-        print('write {}'.format(station_shp_file))
-        for k, v in ppt_zones.items():
-            sta = [vv for kk, vv in met.items() if vv['zone'] == k][0]
-            pt = mapping(Point(sta[pj][1], sta[pj][0]))
-            f = {'type': 'Feature',
-                 'geometry': pt,
-                 'properties': OrderedDict([('FID', k),
-                                            ('MET_ZONE', k),
-                                            ('MET_HRU_ID', v['properties']['MET_HRU_ID']),
-                                            ('STAID', v['properties']['STAID'])])}
-            dst.write(f)
+    out_gdf = gpd.GeoDataFrame().from_dict(met).T
+    out_gdf.geometry = out_gdf['geometry']
+    out_gdf.to_file(out_stations)
 
 
 def calculate_monthly_lapse_rates(csv, station_meta):
