@@ -27,7 +27,7 @@ class CbhruPrmsBuild(StandardPrmsBuild):
 
     def write_datafile(self):
 
-        gages = self.cfg.prms_data_gages
+        gages = self.cfg.usgs_gages
 
         self.data_params = [ParameterRecord(name='nobs', values=[1, ], datatype=1)]
         self.data_params.append(ParameterRecord('nrain', values=[0], datatype=1))

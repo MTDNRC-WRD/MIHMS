@@ -1,15 +1,11 @@
 import os
 
 NOT_NEEDED_XYZ = ['basin_tsta',
-                  'dday_intcp',
-                  'dday_slope',
                   'gvr_cell_pct',
                   'gvr_hru_pct',
                   'hru_psta',
                   'hru_tsta',
                   'max_missing',
-                  'radadj_intcp',
-                  'radadj_slope',
                   'rain_adj',
                   'snow_adj',
                   'soil_moist_init_frac',

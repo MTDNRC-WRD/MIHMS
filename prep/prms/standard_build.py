@@ -24,6 +24,8 @@ from gsflow.builder.builder_defaults import ControlFileDefaults
 from gsflow.builder import builder_utils as bu
 from gsflow.prms.prms_parameter import ParameterRecord
 
+from utils.raster_prep import clip_raster
+
 from models.model_config import PRMSConfig
 from models import PRMS_NOT_REQ
 
@@ -254,9 +256,16 @@ class StandardPrmsBuild:
             self.study_area = geo
             self.bounds = geo.bounds
 
+        if not os.path.exists(self.cfg.elevation):
+            if not os.path.exists(self.cfg.raster_folder):
+                os.mkdir(self.cfg.raster_folder)
+
+            clip_raster(self.cfg.study_area_path, self.cfg.source_rasters, self.cfg.raster_folder, buffer_extent=None)
+
         self.modelgrid = GenerateFishnet(bbox=self.cfg.elevation,
                                          xcellsize=float(self.cfg.hru_cellsize),
                                          ycellsize=float(self.cfg.hru_cellsize))
+
         self.fishnet_file = os.path.join(self.cfg.hru_folder, 'fishnet.shp')
         self.modelgrid.write_shapefile(self.fishnet_file, prj=self.prj)
         self._prepare_rasters()
@@ -363,7 +372,14 @@ class StandardPrmsBuild:
                        ('hru_type', 'study_area_path')]
 
         for param, path in shape_input:
-            shp_file = getattr(self.cfg, path)
+
+            try:
+                shp_file = getattr(self.cfg, path)
+            except AttributeError:
+                print('no {} specified'.format(path))
+                setattr(self, param, None)
+                continue
+
             feats = features(shp_file)
             data = copy(self.zeros)
 
@@ -382,7 +398,9 @@ class StandardPrmsBuild:
                 setattr(self, 'border', border)
                 lakeless = np.where(border, self.zeros + 3, data)
                 setattr(self, 'hru_lakeless', lakeless)
-                data = np.where(self.lake_id > 0, self.zeros + 2, data)
+
+                if self.lake_id:
+                    data = np.where(self.lake_id > 0, self.zeros + 2, data)
 
             setattr(self, param, data)
 

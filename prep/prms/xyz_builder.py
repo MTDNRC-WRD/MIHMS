@@ -4,6 +4,8 @@ import warnings
 from datetime import datetime
 
 import numpy as np
+import geopandas as gpd
+
 from gsflow.builder import builder_utils as bu
 from gsflow.control import ControlRecord
 from gsflow.prms import PrmsData
@@ -15,6 +17,7 @@ from prep.met_data import met_zones_geometries, attribute_precip_zones, calculat
 from prep.prms.standard_build import StandardPrmsBuild
 from utils.bounds import GeoBounds
 from utils.thredds import GridMet
+from utils.elevation import elevation_from_coordinate
 
 from prep.prms import NOT_NEEDED_XYZ
 
@@ -32,27 +35,30 @@ class XyzDistBuild(StandardPrmsBuild):
 
         self.nmonths = 12
 
-        ghcn = self.cfg.prms_data_ghcn
-        stations = self.cfg.prms_data_stations
+        if not os.path.exists(self.cfg.selected_stations):
+            met_zones_geometries(self.cfg.ghcn_stations, self.domain_shapefile, self.cfg.selected_stations,
+                                 zones_out=self.cfg.met_zones, mask=self.study_area)
 
-        if not os.path.exists(stations):
-            met_zones_geometries(self.cfg.all_stations, self.domain_shapefile, self.cfg.prms_data_stations,
-                                 zones_out=self.cfg.prms_data_zones)
+        gages = gpd.read_file(self.cfg.usgs_gages)
+        gages.index = gages['STAID']
+        gages = gages.to_dict(orient='index')
 
-        with open(self.cfg.prms_data_gages, 'r') as js:
-            gages = json.load(js)
+        stations = gpd.read_file(self.cfg.selected_stations)
+        stations.index = stations['STAID']
+        stations = stations.to_dict(orient='index')
 
-        with open(stations, 'r') as js:
-            stations = json.load(js)
+        # if self.cfg.station_choice:
+        #     stations = {k: stations[k] for k in self.cfg.station_choice}
 
-        if self.cfg.selected_stations:
-            stations = {k: stations[k] for k in self.cfg.selected_stations}
-        if self.cfg.selected_gage:
-            gages = {self.cfg.selected_gage: gages[self.cfg.selected_gage]}
+        if self.cfg.gage_choice:
+            gages = {self.cfg.gage_choice: gages[self.cfg.gage_choice]}
 
-        units = 'metric' if self.cfg.precip_units == '1' else 'standard'
+        # if not os.path.exists(self.data_file):
+        units = 'metric' if self.cfg.precip_units == 1 else 'standard'
         new_stations = write_basin_datafile(gages=gages, data_file=self.data_file, stations=stations,
-                                            ghcn_data=ghcn, out_csv=None, units=units, return_modified=True)
+                                            ghcn_data=self.cfg.data_folder, out_csv=None, units=units,
+                                            return_modified=True)
+
         stations = {k: v for k, v in stations.items() if k in new_stations.keys()}
 
         sta_iter = sorted([(v['zone'], v) for k, v in stations.items()], key=lambda x: x[0])
@@ -60,68 +66,56 @@ class XyzDistBuild(StandardPrmsBuild):
         for _, val in sta_iter:
 
             if self.cfg.elev_units == '1':
-                elev = val['elev'] / 0.3048
+                elev = val['ELEV'] / 0.3048
             else:
-                elev = val['elev']
+                elev = val['ELEV']
 
             tsta_elev.append(elev)
             tsta_nuse.append(1)
-            tsta_x.append(val['proj_coords'][1])
-            tsta_y.append(val['proj_coords'][0])
+            tsta_x.append(val['geometry'].x)
+            tsta_y.append(val['geometry'].y)
             psta_elev.append(elev)
 
-        self.data_params = [ParameterRecord('nrain', values=[len(tsta_x)], datatype=1),
+        append_ = [ParameterRecord('nrain', values=[len(tsta_x)], datatype=1),
 
-                            ParameterRecord('ntemp', values=[len(tsta_x)], datatype=1),
+                   ParameterRecord('ntemp', values=[len(tsta_x)], datatype=1),
 
-                            ParameterRecord('psta_elev', np.array(psta_elev, dtype=float).ravel(),
-                                            dimensions=[['nrain', len(psta_elev)]], datatype=2),
+                   ParameterRecord('psta_elev', np.array(psta_elev, dtype=float).ravel(),
+                                   dimensions=[['nrain', len(psta_elev)]], datatype=2),
 
-                            ParameterRecord('psta_nuse', np.array(tsta_nuse, dtype=int).ravel(),
-                                            dimensions=[['nrain', len(tsta_nuse)]], datatype=1),
+                   ParameterRecord('psta_nuse', np.array(tsta_nuse, dtype=int).ravel(),
+                                   dimensions=[['nrain', len(tsta_nuse)]], datatype=1),
 
-                            # ParameterRecord(name='ndist_psta', values=[len(tsta_nuse), ], datatype=1),
+                   ParameterRecord(name='ndist_psta', values=[len(tsta_nuse), ], datatype=1),
 
-                            ParameterRecord('psta_x', np.array(tsta_x, dtype=float).ravel(),
-                                            dimensions=[['nrain', len(tsta_x)]], datatype=2),
+                   ParameterRecord('psta_x', np.array(tsta_x, dtype=float).ravel(),
+                                   dimensions=[['nrain', len(tsta_x)]], datatype=2),
 
-                            ParameterRecord('psta_y', np.array(tsta_y, dtype=float).ravel(),
-                                            dimensions=[['nrain', len(tsta_y)]], datatype=2),
+                   ParameterRecord('psta_y', np.array(tsta_y, dtype=float).ravel(),
+                                   dimensions=[['nrain', len(tsta_y)]], datatype=2),
 
-                            ParameterRecord('tsta_elev', np.array(tsta_elev, dtype=float).ravel(),
-                                            dimensions=[['ntemp', len(tsta_elev)]], datatype=2),
+                   ParameterRecord('tsta_elev', np.array(tsta_elev, dtype=float).ravel(),
+                                   dimensions=[['ntemp', len(tsta_elev)]], datatype=2),
 
-                            ParameterRecord('tsta_nuse', np.array(tsta_nuse, dtype=int).ravel(),
-                                            dimensions=[['ntemp', len(tsta_nuse)]], datatype=1),
+                   ParameterRecord('tsta_nuse', np.array(tsta_nuse, dtype=int).ravel(),
+                                   dimensions=[['ntemp', len(tsta_nuse)]], datatype=1),
 
-                            ParameterRecord(name='ndist_tsta', values=[len(tsta_nuse), ], datatype=1),
+                   ParameterRecord(name='ndist_tsta', values=[len(tsta_nuse), ], datatype=1),
 
-                            ParameterRecord('tsta_x', np.array(tsta_x, dtype=float).ravel(),
-                                            dimensions=[['ntemp', len(tsta_x)]], datatype=2),
+                   ParameterRecord('tsta_x', np.array(tsta_x, dtype=float).ravel(),
+                                   dimensions=[['ntemp', len(tsta_x)]], datatype=2),
 
-                            ParameterRecord('tsta_y', np.array(tsta_y, dtype=float).ravel(),
-                                            dimensions=[['ntemp', len(tsta_y)]], datatype=2),
+                   ParameterRecord('tsta_y', np.array(tsta_y, dtype=float).ravel(),
+                                   dimensions=[['ntemp', len(tsta_y)]], datatype=2),
 
-                            bu.tmax_adj(self.nhru),
+                   bu.tmax_adj(self.nhru),
 
-                            bu.tmin_adj(self.nhru),
+                   bu.tmin_adj(self.nhru),
 
-                            ParameterRecord(name='nobs', values=[1, ], datatype=1),
-                            ]
+                   ParameterRecord(name='nobs', values=[1, ], datatype=1),
+                   ]
 
-        if self.cfg.temp_units == 1:
-            allrain_max = np.ones((self.nhru * self.nmonths)) * 3.3
-        else:
-            allrain_max = np.ones((self.nhru * self.nmonths)) * 38.0
-
-        self.data_params.append(ParameterRecord('tmax_allrain_sta', allrain_max,
-                                                dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
-                                                datatype=2))
-
-        self.data_params.append(ParameterRecord('snowpack_init',
-                                                np.ones_like(self.ksat).ravel(),
-                                                dimensions=[['nhru', self.nhru]],
-                                                datatype=2))
+        [self.data_params.append(rec) for rec in append_]
 
         self.data = PrmsData.load_from_file(self.data_file)
 
@@ -137,11 +131,37 @@ class XyzDistBuild(StandardPrmsBuild):
 
     def write_parameters(self):
 
+        if self.cfg.temp_units == 1:
+            allrain_max = np.ones((self.nhru * self.nmonths)) * 3.3
+        else:
+            allrain_max = np.ones((self.nhru * self.nmonths)) * 38.0
+
+        self.data_params.append(ParameterRecord('tmax_allrain_sta', allrain_max,
+                                                dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
+                                                datatype=2))
+
+        self.data_params.append(ParameterRecord('dday_intcp', np.ones((self.nhru * self.nmonths)) * -40.0,
+                                                dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
+                                                datatype=2))
+        self.data_params.append(ParameterRecord('dday_slope', np.ones((self.nhru * self.nmonths)) * 0.4,
+                                                dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
+                                                datatype=2))
+        self.data_params.append(ParameterRecord('tmax_index', np.ones((self.nhru * self.nmonths)) * 50.0,
+                                                dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
+                                                datatype=2))
+        self.data_params.append(ParameterRecord('radadj_intcp', np.ones((self.nhru * self.nmonths)) * 1.0,
+                                                dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
+                                                datatype=2))
+        self.data_params.append(ParameterRecord('radadj_slope', np.ones((self.nhru * self.nmonths)) * 0.0,
+                                                dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
+                                                datatype=2))
+        self.data_params.append(ParameterRecord('snowpack_init',
+                                                np.ones_like(self.ksat).ravel(),
+                                                dimensions=[['nhru', self.nhru]],
+                                                datatype=2))
+
         if self.data_params is not None:
             [self.parameters.add_record_object(rec) for rec in self.data_params]
-
-        for p in NOT_NEEDED_XYZ:
-            self.parameters.remove_record(p)
 
         self.parameters.write(self.parameter_file)
 
@@ -156,7 +176,7 @@ class XyzDistBuild(StandardPrmsBuild):
         self.control.precip_module = ['xyz_dist']
         self.control.temp_module = ['xyz_dist']
         self.control.et_module = ['potet_jh']
-        self.control.solrad_module = ['ccsolrad']
+        self.control.solrad_module = ['ddsolrad']
 
         if self.control_records is not None:
             [self.control.add_record(rec) for rec in self.control_records]
@@ -166,7 +186,6 @@ class XyzDistBuild(StandardPrmsBuild):
 
 if __name__ == '__main__':
     pass
-
 
 # Username: david.ketchum@umt.edu
 # Employee Email Address:  david.ketchum@mso.umt.edu

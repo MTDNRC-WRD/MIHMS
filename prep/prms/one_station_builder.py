@@ -4,6 +4,7 @@ import warnings
 from datetime import datetime
 
 import numpy as np
+import geopandas as gpd
 from gsflow.builder import builder_utils as bu
 from gsflow.control import ControlRecord
 from gsflow.prms import PrmsData
@@ -39,8 +40,7 @@ class SingleStationBuild(StandardPrmsBuild):
             met_zones_geometries(self.cfg.all_stations, self.domain_shapefile, self.cfg.prms_data_stations,
                                  zones_out=self.cfg.prms_data_zones)
 
-        with open(self.cfg.prms_data_gages, 'r') as js:
-            gages = json.load(js)
+        gages = gpd.read_file(self.cfg.usgs_gages)
 
         with open(stations, 'r') as js:
             stations = json.load(js)
@@ -48,7 +48,7 @@ class SingleStationBuild(StandardPrmsBuild):
         station = self.cfg.selected_stations[0]
         stations = {station: stations[station]}
 
-        gages = {self.cfg.selected_gage: gages[self.cfg.selected_gage]}
+        gages = {self.cfg.gage_choice: gages[self.cfg.gage_choice]}
 
         units = 'metric' if self.cfg.precip_units == '1' else 'standard'
         write_basin_datafile(gages=gages, data_file=self.data_file, stations=stations,
