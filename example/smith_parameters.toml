@@ -1,6 +1,6 @@
 # PRMS Parameter Generator Inputs
 [MODEL_INFO]
-project_folder = "/home/dgketchum/PycharmProjects/MIHMS/example/data"
+project_folder = "C:/Users/CND367/Documents/MIHMs/MIHMS/example/data"
 project_name = "smith"
 hru_cellsize = 3000
 
@@ -18,12 +18,12 @@ precip_units = 1
 temp_units = 1
 runoff_units = 1
 
-gage_choice = "06076690"
+gage_choice = "06078000"
 
-# prms_exe = "/media/research/IrrigationGIS/software/prms5.2.0_linux/bin/prms"
-prms_exe = "/home/dgketchum/prms_5.2.1_linux/bin/prms"
-gdal_warp_exe = "/home/dgketchum/miniconda3/envs/opnt/bin/gdalwarp"
-source_rasters = "/media/research/IrrigationGIS/Montana/statewide_rasters"
+# prms_exe = "/media/research/IrrigationGIS/software/prms5.2.0_linux/bin/prms.exe"
+prms_exe = "C:/Users/CND367/Documents/USGS Models/prms_5.2.1/prms_5.2.1/bin/prms.exe"
+gdal_warp_exe = "C:/Users/CND367/.conda/envs/mihms/Library/bin/gdalwarp.exe"
+source_rasters = "C:/Users/CND367/Documents/MIHMs/MIHMS/example/data/rasters"
 
 
 [INPUT_PATHS]

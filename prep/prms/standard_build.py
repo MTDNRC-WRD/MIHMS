@@ -1,6 +1,6 @@
 import os
 from copy import copy, deepcopy
-from subprocess import call, Popen, PIPE, STDOUT
+from subprocess import run, call, Popen, PIPE, STDOUT
 import time
 
 import numpy as np
@@ -388,10 +388,10 @@ class StandardPrmsBuild:
                 idx = ix.intersect(geo)
                 for x in idx:
                     data[x[0]] = i
+                    if param == 'outlet':
+                        setattr(self, 'pour_pt_rowcol', [[x[0][0], x[0][1]]])
+                        setattr(self, 'pour_pt_coords', [[geo.x, geo.y]])
 
-            if param == 'outlet':
-                setattr(self, 'pour_pt_rowcol', [[x[0][0], x[0][1]]])
-                setattr(self, 'pour_pt_coords', [[geo.x, geo.y]])
             if param == 'hru_type':
                 erode = binary_erosion(data)
                 border = erode < data
@@ -504,7 +504,7 @@ class StandardPrmsBuild:
                 with rasterio.open(out_path, 'r') as src:
                     a = src.read(1)
                     if raster in ['sand', 'clay', 'loam', 'ksat', 'awc']:
-                        a /= 10000.
+                        a = a / 10000
                     if first:
                         self.raster_meta = src.meta
                 setattr(self, raster, a)

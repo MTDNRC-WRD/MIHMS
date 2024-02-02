@@ -4,6 +4,8 @@ import toml
 
 class PRMSConfig:
     def __init__(self, config_path):
+        self.elevation = None
+        self.study_area_path = None
         try:
             config_data = toml.load(config_path)
         except FileNotFoundError:
@@ -37,7 +39,7 @@ class PRMSConfig:
         model_folder = '{}_{}'.format(project_name, str(hru_cellsize))
 
         for key, value in input_paths.items():
-            self.__dict__[key] =os.path.join(project_folder, value)
+            self.__dict__[key] = os.path.join(project_folder, value)
 
         for key, value in model_paths.items():
             self.__dict__[key] = os.path.join(project_folder, model_folder, value)
