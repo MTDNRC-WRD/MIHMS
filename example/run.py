@@ -66,7 +66,7 @@ def compare_parameters(model, csv):
 if __name__ == '__main__':
 
     wspace = os.path.dirname(os.path.abspath(__file__))
-    conf = os.path.join(wspace, 'smith_parameters.toml')
+    conf = os.path.join(wspace, 'musselshell_parameters.toml')
 
     # build_data(conf, overwrite=True)
     run_model(wspace, conf)

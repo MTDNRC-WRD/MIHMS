@@ -67,6 +67,14 @@ class StandardPrmsBuild:
 
         self.zeros = None
 
+        self.sap_gdf = gpd.read_file(self.cfg.study_area_path)  # Re-projects streamstats shapefiles
+        self.prj_sap_gdf = self.sap_gdf.to_crs('epsg:5071')
+        self.prj_sap_gdf.to_file(self.cfg.study_area_path, driver='ESRI Shapefile')
+
+        self.mop_gdf = gpd.read_file(self.cfg.model_outlet_path)
+        self.prj_mop_gdf = self.mop_gdf.to_crs('epsg:5071')
+        self.prj_mop_gdf.to_file(self.cfg.model_outlet_path, driver='ESRI Shapefile')
+
         with fiona.open(self.cfg.study_area_path, 'r') as src:
             self.raster_meta = src.meta
             self.basin_geo = [shape(f['geometry']) for f in src][0]
