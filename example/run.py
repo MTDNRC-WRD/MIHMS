@@ -14,7 +14,7 @@ def run_model(root, config):
     data = os.path.join(root, 'data')
     # matplotlib.use('TkAgg')
 
-    project = os.path.join(data, 'musselshell_{}'.format(prms_build.cfg.hru_cellsize))
+    project = os.path.join(data, '{}_{}'.format(prms_build.cfg.project_name, prms_build.cfg.hru_cellsize))
     luca_dir = os.path.join(project, 'input', 'luca')
     stdout_ = os.path.join(project, 'output', 'stdout.txt')
     # snodas = os.path.join(project, 'input', 'carter_basin_snodas.csv')

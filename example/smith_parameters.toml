@@ -1,12 +1,13 @@
 # PRMS Parameter Generator Inputs
+# Note: Use single quotes only for all filepaths
 [MODEL_INFO]
-project_folder = "C:/Users/CND367/Documents/MIHMs/MIHMS/example/data"
-project_name = "smith"
+project_folder = 'C:\Users\CND367\Documents\MIHMs\MIHMS\example\data'
+project_name = 'smith'
 hru_cellsize = 3000
 
 # Simulation Period yyyy/mm/dd
-start_time = "1990-10-01"
-end_time = "2021-12-31"
+start_time = '1990-10-01'
+end_time = '2021-12-31'
 
 # Units: Note that MANY module-specific parameters are hard-coded.
 # The units for .day files used in CBhru, for example, are hard-coded.
@@ -18,54 +19,54 @@ precip_units = 1
 temp_units = 1
 runoff_units = 1
 
-gage_choice = "06078000"
+gage_choice = '06077500'
 
-# prms_exe = "/media/research/IrrigationGIS/software/prms5.2.0_linux/bin/prms.exe"
-prms_exe = "C:/Users/CND367/Documents/USGS Models/prms_5.2.1/prms_5.2.1/bin/prms.exe"
-gdal_warp_exe = "C:/Users/CND367/.conda/envs/mihms/Library/bin/gdalwarp.exe"
-source_rasters = "C:/Users/CND367/Documents/MIHMs/MIHMS/example/data/rasters"
+# prms_exe = '/media/research/IrrigationGIS/software/prms5.2.0_linux/bin/prms.exe'
+prms_exe = 'C:\Users\CND367\Documents\USGS Models\prms_5.2.1\prms_5.2.1\bin\prms.exe'
+gdal_warp_exe = 'C:\Users\CND367\.conda\envs\mihms\Library\bin\gdalwarp.exe'
+source_rasters = 'C:\Users\CND367\Documents\MIHMs\MIHMS\example\data\rasters'
 
 
 [INPUT_PATHS]
 #### Following paths relative to 'project_folder' above #####
 
-remap_folder = "remaps"
+remap_folder = 'remaps'
 
-usgs_gages = "gages/usgs_gages_wELEV_30yr.shp"
-ghcn_stations = "met/ghcn/ghcn_stations_pnw.shp"
-snotel_stations = "met/snotel/snotel_stations.shp"
+usgs_gages = 'gages\usgs_gages_wELEV_30yr.shp'
+ghcn_stations = 'met\ghcn\ghcn_stations_pnw.shp'
+snotel_stations = 'met\snotel\snotel_stations.shp'
 
 [MODEL_PATHS]
 #### Following paths relative to 'project_folder/{project_name}_{hru_cellsize}' above #####
 
 # Study Area
-study_area_path = "domain/smith_basin.shp"
+study_area_path = 'domain\smith_basin.shp'
 
 # Model outlet point
-model_outlet_path = "domain/smith_gage.shp"
+model_outlet_path = 'domain\smith_gage.shp'
 
 # Stations to use
-selected_stations = "domain/selected_stations.shp"
-prms_data_stations = "domain/prms_data_stations.json"
-met_zones = "domain/met_zones.shp"
+selected_stations = 'domain\selected_stations.shp'
+prms_data_stations = 'domain\prms_data_stations.json'
+met_zones = 'domain\met_zones.shp'
 
 #lake_path = ''
 
 # Rasters
-raster_folder = "rasters"
-elevation = "rasters/elevation.tif"
-landfire_type = "rasters/landfire_type.tif"
-landfire_cover = "rasters/landfire_cover.tif"
-ksat = "rasters/ksat.tif"
-awc = "rasters/awc.tif"
-clay = "rasters/clay.tif"
-sand = "rasters/sand.tif"
-loam = "rasters/loam.tif"
-nlcd = "rasters/nlcd.tif"
+raster_folder = 'rasters'
+elevation = 'rasters\elevation.tif'
+landfire_type = 'rasters\landfire_type.tif'
+landfire_cover = 'rasters\landfire_cover.tif'
+ksat = 'rasters\ksat.tif'
+awc = 'rasters\awc.tif'
+clay = 'rasters\clay.tif'
+sand = 'rasters\sand.tif'
+loam = 'rasters\loam.tif'
+nlcd = 'rasters\nlcd.tif'
 
 ## PRMS Control/Data/Parameter
-parameter_folder = "input"
-control_folder = "control"
-data_folder = "input"
-output_folder = "output"
-hru_folder = "hru_params"
+parameter_folder = 'input'
+control_folder = 'control'
+data_folder = 'input'
+output_folder = 'output'
+hru_folder = 'hru_params'
