@@ -17,7 +17,7 @@ All geospatial data should be in EPSG 5071 Albers Equal Area.
     Save the gage point and the basin delineation as EPSG 5071 in the project's 'domain' folder.
 
 2. Download the statewide rasters (in EPSG:5071) from
-    https://drive.google.com/drive/folders/1AE0b4SA2SXN-zk4W2L-nS1SeAGUtG_HO?usp=drive_link.
+    https://drive.google.com/file/d/1xOLfxBWLJeKRIhHn48zqAbBFvXboR_K8/view
     Move rasters to directories specified in the project .toml.
 
 3. Download required shapefiles from
@@ -25,3 +25,6 @@ All geospatial data should be in EPSG 5071 Albers Equal Area.
     Unzip and move the shapefiles to directories specified in the project .toml.
 
 4. Raster/grid related processing takes place when the StandardBuild object is instantiated.
+
+5. GSFlow remap directories may be found here, note keys may be missing from the directory:
+    https://github.com/gsflow/gsflow-arcpy/tree/master/remaps

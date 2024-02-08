@@ -14,7 +14,7 @@ def run_model(root, config):
     data = os.path.join(root, 'data')
     # matplotlib.use('TkAgg')
 
-    project = os.path.join(data, 'musselshell_{}'.format(prms_build.cfg.hru_cellsize))
+    project = os.path.join(data, '{}_{}'.format(prms_build.cfg.project_name, prms_build.cfg.hru_cellsize))
     luca_dir = os.path.join(project, 'input', 'luca')
     stdout_ = os.path.join(project, 'output', 'stdout.txt')
     # snodas = os.path.join(project, 'input', 'carter_basin_snodas.csv')
@@ -66,7 +66,7 @@ def compare_parameters(model, csv):
 if __name__ == '__main__':
 
     wspace = os.path.dirname(os.path.abspath(__file__))
-    conf = os.path.join(wspace, 'smith_parameters.toml')
+    conf = os.path.join(wspace, 'musselshell_parameters.toml')
 
     # build_data(conf, overwrite=True)
     run_model(wspace, conf)

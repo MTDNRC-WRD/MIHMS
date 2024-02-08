@@ -1,2 +1,12 @@
 /.idea/
 .idea/workspace.xml
+/example/data/musselshell_3000/control/
+/example/data/musselshell_3000/rasters/
+/example/data/musselshell_3000/output/
+/example/data/musselshell_3000/input/
+/example/data/musselshell_3000/hru_params/
+/example/data/smith_3000/control/
+/example/data/smith_3000/hru_params/
+/example/data/smith_3000/input/
+/example/data/smith_3000/output/
+/example/data/smith_3000/rasters/

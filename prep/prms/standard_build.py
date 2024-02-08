@@ -1,6 +1,6 @@
 import os
 from copy import copy, deepcopy
-from subprocess import call, Popen, PIPE, STDOUT
+from subprocess import run, call, Popen, PIPE, STDOUT
 import time
 
 import numpy as np
@@ -66,6 +66,14 @@ class StandardPrmsBuild:
         self.control_records = []
 
         self.zeros = None
+
+        self.sap_gdf = gpd.read_file(self.cfg.study_area_path)  # Re-projects streamstats shapefiles
+        self.prj_sap_gdf = self.sap_gdf.to_crs('epsg:5071')
+        self.prj_sap_gdf.to_file(self.cfg.study_area_path, driver='ESRI Shapefile')
+
+        self.mop_gdf = gpd.read_file(self.cfg.model_outlet_path)
+        self.prj_mop_gdf = self.mop_gdf.to_crs('epsg:5071')
+        self.prj_mop_gdf.to_file(self.cfg.model_outlet_path, driver='ESRI Shapefile')
 
         with fiona.open(self.cfg.study_area_path, 'r') as src:
             self.raster_meta = src.meta
@@ -177,7 +185,7 @@ class StandardPrmsBuild:
         #                         [os.path.join(self.cfg.output_folder, 'init.csv')],
         #                         datatype=4)
 
-        self.control.add_record('data_file', [self.data_file], datatype=4)
+        self.control.add_record('data_file', [self.data_file])
 
         stat_vars = ['runoff',
                      'basin_tmin',
@@ -207,12 +215,11 @@ class StandardPrmsBuild:
                      'basin_lake_stor',
                      'basin_ssstor']
 
-        self.control.add_record('statsON_OFF', values=[1], datatype=1)
-        self.control.add_record('nstatVars', values=[len(stat_vars)], datatype=1)
-        self.control.add_record('statVar_element', values=['1' for _ in stat_vars], datatype=4)
-        self.control.add_record('statVar_names', values=stat_vars, datatype=4)
-        self.control.add_record('stat_var_file', [os.path.join(self.cfg.output_folder, 'statvar.out')],
-                                datatype=4)
+        self.control.add_record('statsON_OFF', values=[1])
+        self.control.add_record('nstatVars', values=[len(stat_vars)])
+        self.control.add_record('statVar_element', values=['1' for _ in stat_vars])
+        self.control.add_record('statVar_names', values=stat_vars)
+        self.control.add_record('stat_var_file', [os.path.join(self.cfg.output_folder, 'statvar.out')])
 
         disp_vars = [('basin_cms', '1'),
                      ('runoff', '1'),
@@ -227,9 +234,9 @@ class StandardPrmsBuild:
                      ('basin_snowdepth', '4'),
                      ('basin_snowmelt', '4')]
 
-        self.control.add_record('dispVar_plot', values=[e[1] for e in disp_vars], datatype=4)
-        self.control.add_record('statVar_names', values=stat_vars, datatype=4)
-        self.control.add_record('dispVar_element', values=['1' for _ in disp_vars], datatype=4)
+        self.control.add_record('dispVar_plot', values=[e[1] for e in disp_vars])
+        self.control.add_record('statVar_names', values=stat_vars)
+        self.control.add_record('dispVar_element', values=['1' for _ in disp_vars])
 
         self.control.add_record('gwr_swale_flag', [1])
 
@@ -267,7 +274,7 @@ class StandardPrmsBuild:
                                          ycellsize=float(self.cfg.hru_cellsize))
 
         self.fishnet_file = os.path.join(self.cfg.hru_folder, 'fishnet.shp')
-        self.modelgrid.write_shapefile(self.fishnet_file, prj=self.prj)
+        self.modelgrid.write_shapefile(self.fishnet_file, prjfile=self.prj)
         self._prepare_rasters()
 
         x = self.modelgrid.xcellcenters.ravel()
@@ -388,10 +395,10 @@ class StandardPrmsBuild:
                 idx = ix.intersect(geo)
                 for x in idx:
                     data[x[0]] = i
+                    if param == 'outlet':
+                        setattr(self, 'pour_pt_rowcol', [[x[0][0], x[0][1]]])
+                        setattr(self, 'pour_pt_coords', [[geo.x, geo.y]])
 
-            if param == 'outlet':
-                setattr(self, 'pour_pt_rowcol', [[x[0][0], x[0][1]]])
-                setattr(self, 'pour_pt_coords', [[geo.x, geo.y]])
             if param == 'hru_type':
                 erode = binary_erosion(data)
                 border = erode < data
@@ -416,12 +423,12 @@ class StandardPrmsBuild:
 
     def _build_veg_params(self):
         self._prepare_lookups()
-        covtype = bu.covtype(self.landfire_type, self.covtype_lut)
+        covtype = bu.covtype(self.landfire_type, self.covtype_lut)  # missing key 3009
         covden_sum = bu.covden_sum(self.landfire_cover, self.covdensum_lut)
         covden_win = bu.covden_win(covtype.values, self.covdenwin_lut)
         rad_trncf = bu.rad_trncf(covden_win.values)
-        snow_intcp = bu.snow_intcp(self.landfire_type, self.snow_intcp_lut)
-        srain_intcp = bu.srain_intcp(self.landfire_type, self.srain_intcp_lut)
+        snow_intcp = bu.snow_intcp(self.landfire_type, self.snow_intcp_lut)  # missing key 3009
+        srain_intcp = bu.srain_intcp(self.landfire_type, self.srain_intcp_lut)  # missing key 3009
         wrain_intcp = bu.wrain_intcp(self.landfire_type, self.snow_intcp_lut)
 
         vars_ = [covtype, covden_sum, covden_win, rad_trncf, snow_intcp, srain_intcp,
@@ -430,7 +437,7 @@ class StandardPrmsBuild:
         for v in vars_:
             self.parameters.add_record_object(v)
 
-        self.root_depth = bu.root_depth(self.landfire_type, self.rtdepth_lut)
+        self.root_depth = bu.root_depth(self.landfire_type, self.rtdepth_lut) # missing key 3009
 
     def _build_soil_params(self):
         cellsize = int(self.cfg.hru_cellsize)
@@ -489,7 +496,7 @@ class StandardPrmsBuild:
         that raster's metadata to resample the rest with gdalwarp"""
         _int = ['landfire_cover', 'landfire_type', 'nlcd']
         _float = ['elevation', 'sand', 'clay', 'loam', 'awc', 'ksat']
-        rasters = _int + _float
+        rasters = _float + _int
 
         first = True
 
@@ -504,7 +511,7 @@ class StandardPrmsBuild:
                 with rasterio.open(out_path, 'r') as src:
                     a = src.read(1)
                     if raster in ['sand', 'clay', 'loam', 'ksat', 'awc']:
-                        a /= 10000.
+                        a = a / 10000
                     if first:
                         self.raster_meta = src.meta
                 setattr(self, raster, a)
@@ -516,6 +523,7 @@ class StandardPrmsBuild:
                 rsample, _dtype = 'nearest', 'UInt16'
 
             if first:
+                print('Creating Example Raster...')
                 robj = flopy.utils.Raster.load(in_path)
 
                 array = robj.resample_to_grid(self.modelgrid, robj.bands[0], method=rsample, thread_pool=8)
@@ -536,6 +544,10 @@ class StandardPrmsBuild:
 
             s = time.time()
             b = self.bounds
+            if rsample == 'nearest':
+                rsample = 'near'
+            print(f'Clipping {raster}...')
+
             warp = [self.cfg.gdal_warp_exe, in_path, out_path,
                     '-te', str(b[0]), str(b[1]), str(b[2] + self.res), str(b[3]),
                     '-ts', str(array.shape[1]), str(array.shape[0]),
@@ -549,7 +561,7 @@ class StandardPrmsBuild:
             with rasterio.open(out_path, 'r') as src:
                 a = src.read(1)
                 if raster in ['sand', 'clay', 'loam', 'ksat', 'awc']:
-                    a /= 10000.
+                    a = a / 10000.
                 if first:
                     self.raster_meta = src.raster_meta
                     first = False
