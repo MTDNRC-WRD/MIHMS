@@ -9,36 +9,67 @@ def get_params():
                            'radadj_intcp': 1.0,
                            'radadj_slope': 0.0,
                            'tmax_index': 50.0},
+
               'intcp': {'epan_coef': None},
+
               'obs': {'rain_code': None, 'runoff_units': None},
+
               'potet_jh': {'jh_coef': None},
-              'soilzone': {'pref_flow_infil_frac': None, 'ssstor_init': None},
+
+              'soilzone': {
+                  'pref_flow_infil_frac': None,
+                  'ssstor_init': None,
+                  'soil_rechr_max_frac': None,
+                  'soil_moist_init_frac': None,
+                  'soil_rechr_init_frac': None,
+                  'ssstor_init_frac': None
+              },
+
               'xyz_dist': {'adjust_rain': None,
                            'adjust_snow': None,
                            'conv_flag': None,
                            'max_lapse': None,
                            'min_lapse': None,
+
+                           'nrain': None,
+                           'ntemp': None,
+                           'nlapse': None,
+                           'rain_code': 2,
+                           'hru_x': None,
+                           'hru_y': None,
+
                            'ppt_add': None,
                            'ppt_div': None,
+                           'psta_elev': None,
                            'ppt_lapse': None,
                            'psta_freq_nuse': None,
                            'psta_month_ppt': None,
+                           'psta_x': None,
+                           'psta_y': None,
+
                            'solrad_elev': None,
+
                            'tmax_add': None,
+                           'tmax_adj': None,
                            'tmax_allrain': None,
                            'tmax_allrain_dist': None,
                            'tmax_allsnow_dist': None,
                            'tmax_div': None,
+
                            'tmin_add': None,
+                           'tmin_adj': None,
                            'tmin_div': None,
+
                            'tsta_month_max': None,
                            'tsta_month_min': None,
+
                            'x_add': None,
                            'x_div': None,
                            'y_add': None,
                            'y_div': None,
                            'z_add': None,
                            'z_div': None}}
+
     return params
 
 
