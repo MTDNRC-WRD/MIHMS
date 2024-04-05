@@ -103,7 +103,7 @@ def met_zones_geometries(station_meta, hru, out_stations, zones_out=None, mask=N
     stations.index = stations['STAID']
     stations = stations.to_dict(orient='index')
 
-    met = {k: v for k, v in stations.items() if int(v['START'][:4]) < 1991 and int(v['END'][:4]) > 2020}
+    met = {k: v for k, v in stations.items() if int(v['START'][:4]) < 2015 and int(v['END'][:4]) > 1991}
 
     xx, yy, zz, s_ids = [], [], [], []
     [(xx.append(v['geometry'].x), yy.append(v['geometry'].y), zz.append(v['ELEV']), s_ids.append(k)) for k, v in met.items()]
@@ -179,7 +179,7 @@ def met_zones_geometries(station_meta, hru, out_stations, zones_out=None, mask=N
 
 
 def calculate_monthly_lapse_rates(csv, station_meta):
-    mdf = read_csv(csv, sep=' ', infer_datetime_format=True, index_col=0, parse_dates=True)
+    mdf = read_csv(csv, sep=' ', index_col=0, parse_dates=True)
     mdf = mdf.groupby(mdf.index.month).mean()
     with open(station_meta, 'r') as js:
         stations = json.load(js)
@@ -209,7 +209,7 @@ def calculate_monthly_lapse_rates(csv, station_meta):
 def attribute_precip_zones(ppt_zones_shp, csv, out_shp):
     """Write collected met data (created during datafile prep) summary to precipitation zones
     shapefile."""
-    mdf = read_csv(csv, sep=' ', infer_datetime_format=True, index_col=0, parse_dates=True)
+    mdf = read_csv(csv, sep=' ', index_col=0, parse_dates=True)
 
     with fiona.open(ppt_zones_shp, 'r') as src:
         features = [f for f in src]
@@ -260,5 +260,9 @@ def forecast_bias_monthly(station_meta, bias_meta):
 
 
 if __name__ == '__main__':
-    pass
+    df = download_ghcn('USC00245740', '/home/dgketchum/Downloads/USC00245740.csv', start='1894-01-01')
+    df = df * 0.1
+    df = (df * 9 / 5) + 32.
+    df['Year'] = [i.year for i in df.index]
+    annual_min_temp = df.groupby('Year')['TMIN'].min()
 # ========================= EOF ====================================================================
