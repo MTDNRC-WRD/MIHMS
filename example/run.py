@@ -34,14 +34,14 @@ def run_model(root, config, project_str, verbose=False):
     prms.run_model(stdout_)
 
 
-def read_output(config):
+def read_output(config, snow):
     prms_build = XyzDistBuild(config)
 
     prms = MontanaPrmsModel(prms_build.control_file,
                             prms_build.parameter_file,
                             prms_build.data_file)
 
-    stats_uncal = prms.get_statvar()
+    stats_uncal = prms.get_statvar(snow)
     fig_ = os.path.join(prms_build.cfg.output_folder, 'hydrograph_uncal.png')
     plot_stats(stats_uncal, fig_)
 
@@ -70,9 +70,12 @@ def compare_parameters(config, csv):
 
 if __name__ == '__main__':
     project_ = 'smith'
+    res = 3000
     wspace = os.path.dirname(os.path.abspath(__file__))
-    conf = os.path.join(wspace, '{}_parameters.toml'.format(project_))
+    conf = os.path.join(wspace, 'data', '{}_{}'.format(project_, res), '{}_parameters.toml'.format(project_))
     # build_model(conf)
-    # run_model(wspace, conf, project_)
-    read_output(conf)
+    # run_model(wspace, conf, project_, verbose=True)
+
+    swe = '/home/dgketchum/PycharmProjects/MIHMS/example/data/smith_3000/input/snodas.json'
+    read_output(conf, swe)
 # ========================= EOF ====================================================================
