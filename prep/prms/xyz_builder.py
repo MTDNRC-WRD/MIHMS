@@ -102,6 +102,14 @@ class XyzDistBuild(StandardPrmsBuild):
                    ParameterRecord('tsta_y', np.array(tsta_y, dtype=float).ravel(),
                                    dimensions=[['ntemp', len(tsta_y)]], datatype=2),
 
+                   ParameterRecord('tmax_allrain_dist', 1.5,
+                                   dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
+                                   datatype=2),
+
+                   ParameterRecord('tmax_allsnow_dist', 0.0,
+                                   dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
+                                   datatype=2),
+
                    bu.tmax_adj(self.nhru),
 
                    bu.tmin_adj(self.nhru),
@@ -169,8 +177,6 @@ class XyzDistBuild(StandardPrmsBuild):
             [self.control.add_record(rec) for rec in self.control_records]
 
         self.control.write(self.control_file)
-
-
 
 
 if __name__ == '__main__':
