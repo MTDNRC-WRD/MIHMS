@@ -183,7 +183,7 @@ class StandardPrmsBuild:
         #                         [os.path.join(self.cfg.output_folder, 'init.csv')],
         #                         datatype=4)
 
-        self.control.add_record('data_file', [self.data_file], datatype=4)
+        self.control.add_record('data_file', [self.data_file])
 
         stat_vars = ['runoff',
                      'basin_tmin',
@@ -213,12 +213,11 @@ class StandardPrmsBuild:
                      'basin_lake_stor',
                      'basin_ssstor']
 
-        self.control.add_record('statsON_OFF', values=[1], datatype=1)
-        self.control.add_record('nstatVars', values=[len(stat_vars)], datatype=1)
-        self.control.add_record('statVar_element', values=['1' for _ in stat_vars], datatype=4)
-        self.control.add_record('statVar_names', values=stat_vars, datatype=4)
-        self.control.add_record('stat_var_file', [os.path.join(self.cfg.output_folder, 'statvar.out')],
-                                datatype=4)
+        self.control.add_record('statsON_OFF', values=[1])
+        self.control.add_record('nstatVars', values=[len(stat_vars)])
+        self.control.add_record('statVar_element', values=['1' for _ in stat_vars])
+        self.control.add_record('statVar_names', values=stat_vars)
+        self.control.add_record('stat_var_file', [os.path.join(self.cfg.output_folder, 'statvar.out')])
 
         disp_vars = [('basin_cms', '1'),
                      ('runoff', '1'),
@@ -233,9 +232,9 @@ class StandardPrmsBuild:
                      ('basin_snowdepth', '4'),
                      ('basin_snowmelt', '4')]
 
-        self.control.add_record('dispVar_plot', values=[e[1] for e in disp_vars], datatype=4)
-        self.control.add_record('statVar_names', values=stat_vars, datatype=4)
-        self.control.add_record('dispVar_element', values=['1' for _ in disp_vars], datatype=4)
+        self.control.add_record('dispVar_plot', values=[e[1] for e in disp_vars])
+        self.control.add_record('statVar_names', values=stat_vars)
+        self.control.add_record('dispVar_element', values=['1' for _ in disp_vars])
 
         self.control.add_record('gwr_swale_flag', [1])
 
@@ -413,10 +412,10 @@ class StandardPrmsBuild:
     def _build_lakes(self):
         lakes = bu.lake_hru_id(self.lake_id)
         nlake = ParameterRecord(
-            name='nlake', values=[np.unique(self.lake_id)], datatype=1, file_name=None
+            name='nlake', values=[np.unique(self.lake_id)], file_name=None
         )
         nlake_hrus = ParameterRecord(
-            name='nlake_hrus', values=[np.count_nonzero(self.lake_id)], datatype=1, file_name=None
+            name='nlake_hrus', values=[np.count_nonzero(self.lake_id)], file_name=None
         )
         [self.parameters.add_record_object(l) for l in [lakes, nlake, nlake_hrus]]
 

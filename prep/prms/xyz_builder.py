@@ -102,11 +102,11 @@ class XyzDistBuild(StandardPrmsBuild):
                    ParameterRecord('tsta_y', np.array(tsta_y, dtype=float).ravel(),
                                    dimensions=[['ntemp', len(tsta_y)]], datatype=2),
 
-                   ParameterRecord('tmax_allrain_dist', 1.5,
+                   ParameterRecord('tmax_allrain_dist', np.ones((self.nhru, self.nmonths), dtype=float).ravel() * 1.5,
                                    dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
                                    datatype=2),
 
-                   ParameterRecord('tmax_allsnow_dist', 0.0,
+                   ParameterRecord('tmax_allsnow_dist', np.ones((self.nhru, self.nmonths), dtype=float).ravel() * 0.0,
                                    dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
                                    datatype=2),
 
