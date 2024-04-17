@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import numpy as np
 import pandas as pd
@@ -20,18 +21,19 @@ def build_pest(model_dir, pest_dir, input_data, **kwargs):
     # ======= Discharge Observations ==================
     obsnme_str = 'oname:obs_q_otype:arr_i:{}_j:0'
 
-    pest.add_observations(kwargs['obs']['file'], insfile=kwargs['obs']['insfile'])
+    pest.add_observations(kwargs['q_obs']['file'], insfile=kwargs['q_obs']['insfile'])
 
     qdf = pd.read_csv(input_data, index_col=None, parse_dates=True)
+    swe_df = qdf.copy()
     qdf['dummy_idx'] = [obsnme_str.format(j) for j in range(qdf.shape[0])]
     valid = [i for i, r in qdf.iterrows() if r[qdf.columns[0]]]
     valid = qdf['dummy_idx'].loc[valid]
 
     d = pest.obs_dfs[0].copy()
     d['weight'] = 0.0
-    d.loc['weight', valid] = 1.0
-    d.loc['weight', np.isnan(d['obsval'])] = 0.0
-    d.loc['obsval', np.isnan(d['obsval'])] = -99.0
+    d.loc[valid, 'weight'] = 1.0
+    d.loc[np.isnan(d['obsval']), 'weight'] = 0.0
+    d.loc[np.isnan(d['obsval']), 'obsval'] = -99.0
     d['idx'] = d.index.map(lambda i: int(i.split(':')[3].split('_')[0]))
     d = d.sort_values(by='idx')
     d.drop(columns=['idx'], inplace=True)
@@ -41,11 +43,13 @@ def build_pest(model_dir, pest_dir, input_data, **kwargs):
     # ======= Snow Observations ==================
     obsnme_str = 'oname:obs_swe_otype:arr_i:{}_j:0'
 
-    pest.add_observations(kwargs['swe_obs']['file'][j], insfile=kwargs['swe_obs']['insfile'][j])
+    pest.add_observations(kwargs['swe_obs']['file'], insfile=kwargs['swe_obs']['insfile'])
 
     # only weight swe Nov - Apr
-    swe_df = pd.read_csv(kwargs['inputs'][i], index_col=0, parse_dates=True)
-    swe_df['dummy_idx'] = [obsnme_str.format(fid, j) for j in range(swe_df.shape[0])]
+    # reuse input df from above for it's time information
+    # we forced the q and swe arrays into the same time in preproc.py
+    swe_df['dummy_idx'] = [obsnme_str.format(j) for j in range(swe_df.shape[0])]
+    swe_df.index = [pd.to_datetime(dt) for dt in swe_df['date']]
     valid = [ix for ix, r in swe_df.iterrows() if ix.month in [11, 12, 1, 2, 3, 4]]
     valid = swe_df['dummy_idx'].loc[valid]
 
@@ -53,20 +57,51 @@ def build_pest(model_dir, pest_dir, input_data, **kwargs):
     d['weight'] = 0.0
 
     # TODO: adjust as needed for phi visibility of eta vs. swe
-    d.loc['weight', valid] = 0.03
-    d.loc['weight', np.isnan(d['obsval'])] = 0.0
-    d.loc['obsval', np.isnan(d['obsval'])] = -99.0
+    d.loc[valid, 'weight'] = 0.03
+    d.loc[np.isnan(d['obsval']), 'weight'] = 0.0
+    d.loc[np.isnan(d['obsval']), 'obsval'] = -99.0
 
     d['idx'] = d.index.map(lambda i: int(i.split(':')[3].split('_')[0]))
     d = d.sort_values(by='idx')
     d.drop(columns=['idx'], inplace=True)
-
     pest.obs_dfs[1] = d
+
+    ofiles = [str(x).replace('obs', 'pred') for x in pest.output_filenames]
+    pest.output_filenames = ofiles
+    os.makedirs(os.path.join(pest_dir, 'pred'))
 
     pest.py_run_file = 'custom_forward_run.py'
     pest.mod_command = 'python custom_forward_run.py'
 
-    pest.build_pst()
+    pest.build_pst(version=2)
+
+    # the build function wrote a generic python runner that we replace with our own
+    # with some work, pymeu build can do this for us
+    auto_gen = os.path.join(pest_dir, 'custom_forward_run.py')
+    runner = kwargs['python_script']
+    shutil.copyfile(runner, auto_gen)
+
+    # clean up the new pest directory
+    for dd in ['master', 'workers']:
+        try:
+            shutil.rmtree(os.path.join(pest_dir, dd))
+        except FileNotFoundError:
+            continue
+
+    # hack to write measurement std post-build, which if not included, 'weight' will be interpreted as std dev
+    # this will be used to add noise to non-zero weighted obs data in e.g., tongue.obs+noise.csv
+    # TODO: pre-compute observation ensembles, implement autocorrelated transient noise
+    # see: github.com/gmdsi/GMDSI_notebooks/blob/main/tutorials/part2_02_obs_and_weights/freyberg_obs_and_weights.ipynb
+    pst = Pst(os.path.join(pest.new_d, '{}.pst'.format(os.path.basename(model_dir))))
+    obs = pst.observation_data
+    obs['standard_deviation'] = np.nan
+    obs.loc[[i for i in obs.index if 'q' in i], 'standard_deviation'] = obs['obsval'] * 0.05
+    obs.loc[[i for i in obs.index if 'swe' in i], 'standard_deviation'] = obs['obsval'] * 0.02
+
+    # add time information
+    obs['time'] = [float(i.split(':')[3].split('_')[0]) for i in obs.index]
+
+    pst.write(pst.filename, version=2)
 
 
 def build_localizer(pst_file):
@@ -101,6 +136,11 @@ def build_localizer(pst_file):
     mat_file = os.path.join(os.path.dirname(pst_file), 'loc.mat')
     Matrix.from_dataframe(localizer).to_ascii(mat_file)
 
+    pst.write(pst_file, version=2)
+
+
+def set_control_settings(pst_file):
+    pst = Pst(pst_file)
     pst.pestpp_options["ies_localizer"] = "loc.mat"
     pst.pestpp_options["ies_num_reals"] = 100
 
@@ -111,14 +151,13 @@ def build_localizer(pst_file):
 
 
 def params_dict_from_csv(_file):
-
     q_obs_file = 'obs/obs_q.np'
     swe_obs_file = 'obs/obs_swe.np'
 
     pdct = {'q_obs': {'file': q_obs_file,
                       'insfile': ins},
             'swe_obs': {'file': swe_obs_file,
-                        'insfile': ins}
+                        'insfile': ins},
             }
 
     df = pd.read_csv(_file, header=None)
@@ -142,8 +181,10 @@ def params_dict_from_csv(_file):
 
 
 if __name__ == '__main__':
+
     project = 'smith_3000'
-    root = '/home/dgketchum/PycharmProjects/MIHMS/example/data'
+    src = '/home/dgketchum/PycharmProjects/MIHMS'
+    root = os.path.join(src, 'example', 'data')
     d = os.path.join(root, '{}'.format(project))
 
     data = os.path.join(d, 'input')
@@ -157,6 +198,9 @@ if __name__ == '__main__':
 
     # this just prints out the params dict for use below
     dct = params_dict_from_csv(p_file)
+    python_script = os.path.join(src, 'calibrate', 'custom_forward_run.py')
+    # noinspection PyTypedDict
+    dct.update({'python_script': python_script})
 
     build_pest(d, pp_dir, input_csv, **dct)
 
