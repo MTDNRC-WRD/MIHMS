@@ -130,7 +130,7 @@ class MontanaPrmsModel(HydroModel):
 
         return success, buff
 
-    def get_statvar(self, snow_obs):
+    def get_statvar(self, snow_obs=None, return_df=True, **kwargs):
 
         self.statvar = StatVar.load_from_control_object(self.control)
         df = self.statvar.stat_df
@@ -142,7 +142,7 @@ class MontanaPrmsModel(HydroModel):
         if self.control.get_record('runoff_units').values[0] == 0:
             df['runoff'] = df['runoff'] / 0.028317
 
-        df['runoff'][df['runoff'] < 0.0] = np.nan
+        df.loc[df['runoff'] < 0.0, 'runoff'] = np.nan
 
         # try to get all the water balance components into MCMS per day
         df['obs_q'] = 60 * 60 * 24 * df['runoff'] / 1e6
@@ -168,6 +168,16 @@ class MontanaPrmsModel(HydroModel):
 
         [inches_to_million_cubic_meters(k) for k, v in VAR_UNITS.items() if k in basin_vars and v == 'inches']
 
+        if 'output' in kwargs.keys():
+
+            write = kwargs['output']
+            for k, v in write.items():
+                arr = df[k].values
+                np.savetxt(v, arr)
+
+            if not return_df:
+                return None
+
         s, e = self.control.get_values('start_time'), self.control.get_values('end_time')
         try:
             df.index = pd.date_range('{}-{}-{}'.format(s[0], s[1], s[2]),
@@ -176,16 +186,17 @@ class MontanaPrmsModel(HydroModel):
         except ValueError:
             pass
 
-        with open(snow_obs, 'r') as fp:
-            s = json.load(fp)
+        if snow_obs:
+            with open(snow_obs, 'r') as fp:
+                s = json.load(fp)
 
-        s = [(k, v['0']) for k, v in s.items()]
-        s = sorted(s, key=lambda x: x[0])
-        dt = pd.DatetimeIndex([pd.to_datetime(d[0]) for d in s])
-        s = [a[1] for a in s]
-        s = np.array(s) * basin_area / 1e6
-        s = pd.Series(index=dt, data=s, name='swe_obs')
-        df = pd.concat([df, s], axis=1, ignore_index=False)
+            s = [(k, v['0']) for k, v in s.items()]
+            s = sorted(s, key=lambda x: x[0])
+            dt = pd.DatetimeIndex([pd.to_datetime(d[0]) for d in s])
+            s = [a[1] for a in s]
+            s = np.array(s) * basin_area / 1e6
+            s = pd.Series(index=dt, data=s, name='swe_obs')
+            df = pd.concat([df, s], axis=1, ignore_index=False)
 
         # Agrimet data
         # 0.04184 mj m2-1 per langley
