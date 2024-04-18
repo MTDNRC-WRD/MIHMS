@@ -57,4 +57,4 @@ if __name__ == '__main__':
 
     swe_series = '/home/dgketchum/PycharmProjects/MIHMS/example/data/smith_3000/input/snodas.json'
     observations_ = {'swe': swe_series}
-    preproc(proj_dir, conf, **observations_)
+    preproc(proj_dir, conf, write_model=True, **observations_)
