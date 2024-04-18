@@ -74,10 +74,15 @@ class XyzDistBuild(StandardPrmsBuild):
 
                    ParameterRecord('ntemp', values=[len(tsta_x)], datatype=1),
 
+                   ParameterRecord('nlapse', values=[len(tsta_x)], datatype=1),
+
                    ParameterRecord('psta_elev', np.array(psta_elev, dtype=float).ravel(),
                                    dimensions=[['nrain', len(psta_elev)]], datatype=2),
 
                    ParameterRecord('psta_nuse', np.array(tsta_nuse, dtype=int).ravel(),
+                                   dimensions=[['nrain', len(tsta_nuse)]], datatype=1),
+
+                   ParameterRecord('psta_freq_nuse', np.array(tsta_nuse, dtype=int).ravel(),
                                    dimensions=[['nrain', len(tsta_nuse)]], datatype=1),
 
                    ParameterRecord(name='ndist_psta', values=[len(tsta_nuse), ], datatype=1),
@@ -102,12 +107,12 @@ class XyzDistBuild(StandardPrmsBuild):
                    ParameterRecord('tsta_y', np.array(tsta_y, dtype=float).ravel(),
                                    dimensions=[['ntemp', len(tsta_y)]], datatype=2),
 
-                   ParameterRecord('tmax_allrain_dist', np.ones((self.nhru, self.nmonths), dtype=float).ravel() * 1.5,
-                                   dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
+                   ParameterRecord('tmax_allrain_dist', np.ones((1, self.nmonths), dtype=float).ravel() * 1.5,
+                                   dimensions=[['nmonths', self.nmonths]],
                                    datatype=2),
 
-                   ParameterRecord('tmax_allsnow_dist', np.ones((self.nhru, self.nmonths), dtype=float).ravel() * 0.0,
-                                   dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
+                   ParameterRecord('tmax_allsnow_dist', np.ones((1, self.nmonths), dtype=float).ravel() * 0.0,
+                                   dimensions=[['nmonths', self.nmonths]],
                                    datatype=2),
 
                    bu.tmax_adj(self.nhru),

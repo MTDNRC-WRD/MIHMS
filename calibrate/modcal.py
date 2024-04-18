@@ -58,7 +58,7 @@ class GSFLOW():
         self.gsf_model.write_input(write_only=['parameters'])
 
     def simulations(self):
-        self.gsf_model.run_model()
+        self.gsf_model.run_model_priors()
         self.gsf_output = self.gsf_model.get_StatVar()
 
     def calibrate(self):

@@ -5,7 +5,7 @@ project_name = "smith"
 hru_cellsize = 3000
 
 # Simulation Period yyyy/mm/dd
-start_time = "1990-10-01"
+start_time = "2015-10-01"
 end_time = "2021-12-31"
 
 # Units: Note that MANY module-specific parameters are hard-coded.

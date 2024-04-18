@@ -42,8 +42,8 @@ def run_model(proj_dir, control, params, data, output_dir):
     prms.parameters.write(params)
     prms.run_model()
 
-    args = {'output': {'pred_q': os.path.join(output_dir, 'q.np'),
-                       'basin_pweqv': os.path.join(output_dir, 'swe.np')}}
+    args = {'output': {'pred_q': os.path.join(output_dir, 'pred_q.np'),
+                       'basin_pweqv': os.path.join(output_dir, 'pred_swe.np')}}
 
     prms.get_statvar(snow_obs=None, return_df=False, **args)
 
