@@ -208,18 +208,18 @@ def params_dict_from_defaults(dst_file):
                 continue
 
             try:
-                pars[kk] = {'param': kk,
-                            'file': dst_file,
+                pars[kk] = {'file': dst_file,
                             'initial_value': vv[2],
                             'lower_bound': vv[0],
                             'upper_bound': vv[1],
                             'pargp': kk,
                             'index_cols': 0,
                             'use_cols': 3,
-                            'use_rows': ct,
-                            'module': k}
+                            'use_rows': ct}
 
                 df.loc[ct] = pars[kk]
+                df.loc[ct, 'param'] = kk
+                df.loc[ct, 'module'] = k
                 ct += 1
 
             except TypeError:
@@ -245,12 +245,8 @@ if __name__ == '__main__':
 
     ins = '{}.ins'.format(project)
 
-    # deprecate this params source ASAP
-    p_file = os.path.join(d, 'prms_params_rio_hondo.csv')
-    df = pd.read_csv(p_file, header=None)
-
-    p_file = os.path.join(pp_dir, 'prms_params.csv')
-    dct_ = params_dict_from_defaults(p_file)
+    dst_parms_file = os.path.join(d, 'prms_params.csv')
+    dct_ = params_dict_from_defaults(dst_parms_file)
 
     python_script = os.path.join(src, 'calibrate', 'custom_forward_run.py')
     # noinspection PyTypedDict
