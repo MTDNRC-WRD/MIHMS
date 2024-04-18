@@ -4,7 +4,7 @@ from pprint import pprint
 
 def get_params():
     """Dict of the form param: lower bound, upper bound, initial value"""
-    params = {'basin_sum': {'outlet_sta': 0},
+    params = {'basin_sum': {'outlet_sta': (None, None, 0)},
 
               'required': {
                   'fastcoef_lin': (0.0, 1.0, 0.1),
@@ -18,31 +18,30 @@ def get_params():
                   'soil2gw_exp': (0.0, 3.0, 1.0),
                   'soil2gw_rate': (0.0001, 999.0, 0.1),
                   'gwflow_coef': (0.0, 0.5, 0.015),
-                  'gwsink_coef': (0.0, 1.0, 0.0),
-                  'gwstor_init': (0.0, 50.0, 2.0),
-                  'gwstor_min': (0.0, 1.0, 0.0),
+                  'gwsink_coef': (0.0, 1.0, 0.01),
+                  'gwstor_init': (0.0, 50.0, 5.0),
+                  'gwstor_min': (0.0, 1.0, 0.01),
 
               },
 
-              'ddsolrad': {'dday_intcp': -40.0,
-                           'dday_slope': 0.4,
-                           'radadj_intcp': 1.0,
-                           'radadj_slope': 0.0,
-                           'tmax_index': 50.0},
+              'ddsolrad': {'dday_intcp': (-60.0, 10, -40.0),
+                           'dday_slope': (0.1, 1.4, 0.4),
+                           'radadj_intcp': (0.0, 1.0, 1.0),
+                           'radadj_slope': (0.0, 1.0, 0.0),
+                           'tmax_index': (-10.0, 30.0, 17.0)},
 
-              'intcp': {'epan_coef': None},
+              # 'intcp': {'epan_coef': None},
 
-              'obs': {'rain_code': None, 'runoff_units': None},
+              # 'obs': {'rain_code': None, 'runoff_units': None},
 
-              'potet_jh': {'jh_coef': None},
+              'potet_jh': {'jh_coef': (-0.5, 1.5, 0.014)},
 
               'soilzone': {
-                  'pref_flow_infil_frac': None,
-                  'ssstor_init': None,
-                  'soil_rechr_max_frac': None,
-                  'soil_moist_init_frac': None,
-                  'soil_rechr_init_frac': None,
-                  'ssstor_init_frac': None
+                  'ssstor_init': (0.0, 10.0, 0.0),
+                  'soil_rechr_max_frac': (0.00001, 1.0, 1.0),
+                  'soil_moist_init_frac': (0.0, 1.0, 0.0),
+                  'soil_rechr_init_frac': (0.0, 1.0, 0.0),
+                  'ssstor_init_frac': (0.0, 1.0, 0.0)
               },
 
               'xyz_dist': {'adjust_rain': (-0.5, 3.0, -0.4),
@@ -51,27 +50,27 @@ def get_params():
                            'max_lapse': (-100.0, 100.0, 0.0),
                            'min_lapse': (-100.0, 100.0, 0.0),
 
-                           'nrain': None,
-                           'ntemp': None,
-                           'nlapse': None,
-                           'rain_code': 2,
-                           'hru_x': None,
-                           'hru_y': None,
+                           # 'nrain': None, # set in builder
+                           # 'ntemp': None, # set in builder
+                           # 'nlapse': None, # set in builder
+                           # 'rain_code': (None, None, 2), # use default
+                           # 'hru_x': None, # set in builder
+                           # 'hru_y': None, # set in builder
 
                            'ppt_add': (-10., 10., 0.0),
                            'ppt_div': (-10., 10., 1.0),
-                           'psta_elev': None,
+                           # 'psta_elev': None, # set in builder
                            'ppt_lapse': (-10., 10., 0.0),
-                           'psta_freq_nuse': None,
-                           'psta_month_ppt': '0.0 to 20.0 0.0',
-                           'psta_x': None,
-                           'psta_y': None,
+                           # 'psta_freq_nuse': None, # set in builder
+                           'psta_month_ppt': (0.0, 20.0, 0.0),
+                           # 'psta_x': None, # set in builder
+                           # 'psta_y': None, # set in builder
 
-                           'solrad_elev': None,
+                           # 'solrad_elev': None,  # TODO add solrad station?
 
                            'tmax_add': (-10., 10., 0.0),
                            'tmax_adj': (-10., 10., 0.0),
-                           'tmax_allrain': None,
+                           'tmax_allrain': (0.0, 3.0, 1.5),
                            'tmax_allrain_dist': (0.0, 3.0, 1.5),
                            'tmax_allsnow_dist': (-1.0, 2.0, 0.0),
                            'tmax_div': (-10., 10., 1.0),
@@ -80,8 +79,8 @@ def get_params():
                            'tmin_adj': (-10., 10., 0.0),
                            'tmin_div': (-10., 10., 1.0),
 
-                           'tsta_month_max': None,
-                           'tsta_month_min': None,
+                           # 'tsta_month_max': None,  # TODO add climatology info
+                           # 'tsta_month_min': None,  # TODO add climatology info
 
                            'x_add': (-1.0e7, 1.0e7, 0.0),
                            'x_div': (-1.0e7, 1.0e7, 1.0),
