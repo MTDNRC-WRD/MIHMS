@@ -6,7 +6,7 @@ import pandas as pd
 from pyemu import Pst, Matrix
 from pyemu.utils import PstFrom
 
-from prep.prms import default_params
+from prep.prms.default_params import tuning_parameters, get_params
 
 
 def build_pest(model_dir, pest_dir, input_data, **kwargs):
@@ -193,7 +193,8 @@ def params_dict_from_defaults(dst_file):
             }
 
     pars = {}
-    dct = default_params.get_params()
+    dct = get_params()
+    tunable_params = tuning_parameters()
 
     columns = ['param', 'module', 'lower_bound', 'upper_bound', 'initial_value',
                'use_cols', 'use_rows', 'file']
@@ -202,20 +203,25 @@ def params_dict_from_defaults(dst_file):
     ct = 0
     for k, v in dct.items():
         for kk, vv in v.items():
+
+            if kk not in tunable_params:
+                continue
+
             try:
                 pars[kk] = {'param': kk,
-                        'file': dst_file,
-                        'initial_value': vv[2],
-                        'lower_bound': vv[0],
-                        'upper_bound': vv[1],
-                        'pargp': kk,
-                        'index_cols': 0,
-                        'use_cols': 3,
-                        'use_rows': ct,
-                        'module': k}
+                            'file': dst_file,
+                            'initial_value': vv[2],
+                            'lower_bound': vv[0],
+                            'upper_bound': vv[1],
+                            'pargp': kk,
+                            'index_cols': 0,
+                            'use_cols': 3,
+                            'use_rows': ct,
+                            'module': k}
 
                 df.loc[ct] = pars[kk]
                 ct += 1
+
             except TypeError:
                 print('Improper formatting, {}, {}'.format(k, kk))
 
@@ -240,7 +246,8 @@ if __name__ == '__main__':
     ins = '{}.ins'.format(project)
 
     # deprecate this params source ASAP
-    # p_file = os.path.join(d, 'prms_params_rio_hondo.csv')
+    p_file = os.path.join(d, 'prms_params_rio_hondo.csv')
+    df = pd.read_csv(p_file, header=None)
 
     p_file = os.path.join(pp_dir, 'prms_params.csv')
     dct_ = params_dict_from_defaults(p_file)
