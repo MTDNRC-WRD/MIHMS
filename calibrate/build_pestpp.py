@@ -6,6 +6,8 @@ import pandas as pd
 from pyemu import Pst, Matrix
 from pyemu.utils import PstFrom
 
+from prep.prms import default_params
+
 
 def build_pest(model_dir, pest_dir, input_data, **kwargs):
     pest = PstFrom(model_dir, pest_dir, remove_existing=True)
@@ -180,8 +182,50 @@ def params_dict_from_csv(_file):
     return pdct
 
 
-if __name__ == '__main__':
+def params_dict_from_defaults(dst_file):
+    q_obs_file = 'obs/obs_q.np'
+    swe_obs_file = 'obs/obs_swe.np'
 
+    pdct = {'q_obs': {'file': q_obs_file,
+                      'insfile': ins},
+            'swe_obs': {'file': swe_obs_file,
+                        'insfile': ins},
+            }
+
+    pars = {}
+    dct = default_params.get_params()
+
+    columns = ['param', 'module', 'lower_bound', 'upper_bound', 'initial_value',
+               'use_cols', 'use_rows', 'file']
+    df = pd.DataFrame(columns=columns, index=list(range(1000)))
+
+    ct = 0
+    for k, v in dct.items():
+        for kk, vv in v.items():
+            try:
+                pars[kk] = {'param': kk,
+                        'file': dst_file,
+                        'initial_value': vv[2],
+                        'lower_bound': vv[0],
+                        'upper_bound': vv[1],
+                        'pargp': kk,
+                        'index_cols': 0,
+                        'use_cols': 3,
+                        'use_rows': ct,
+                        'module': k}
+
+                df.loc[ct] = pars[kk]
+                ct += 1
+            except TypeError:
+                print('Improper formatting, {}, {}'.format(k, kk))
+
+    pdct.update({'pars': pars})
+    df.dropna(axis=0, how='all', inplace=True)
+    df.to_csv(dst_file)
+    return pdct
+
+
+if __name__ == '__main__':
     project = 'smith_3000'
     src = '/home/dgketchum/PycharmProjects/MIHMS'
     root = os.path.join(src, 'example', 'data')
@@ -194,15 +238,20 @@ if __name__ == '__main__':
     pest_file = os.path.join(pp_dir, '{}.pst'.format(project))
 
     ins = '{}.ins'.format(project)
-    p_file = os.path.join(d, 'prms_params_rio_hondo.csv')
 
-    # this just prints out the params dict for use below
-    dct = params_dict_from_csv(p_file)
+    # deprecate this params source ASAP
+    # p_file = os.path.join(d, 'prms_params_rio_hondo.csv')
+
+    p_file = os.path.join(pp_dir, 'prms_params.csv')
+    dct_ = params_dict_from_defaults(p_file)
+
     python_script = os.path.join(src, 'calibrate', 'custom_forward_run.py')
     # noinspection PyTypedDict
-    dct.update({'python_script': python_script})
+    dct_.update({'python_script': python_script})
 
-    build_pest(d, pp_dir, input_csv, **dct)
+    build_pest(d, pp_dir, input_csv, **dct_)
 
     build_localizer(pest_file)
+
+    set_control_settings(pest_file)
 # ========================= EOF ====================================================================
