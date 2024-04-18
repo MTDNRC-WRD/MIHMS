@@ -107,10 +107,8 @@ def build_pest(model_dir, pest_dir, input_data, **kwargs):
 
 
 def build_localizer(pst_file):
-    et_params = ['aw', 'rew', 'tew', 'ndvi_alpha', 'ndvi_beta', 'mad']
-    snow_params = ['swe_alpha', 'swe_beta']
 
-    par_relation = {'eta': et_params, 'swe': snow_params}
+    tuning_params = tuning_parameters()
 
     pst = Pst(pst_file)
 
@@ -127,13 +125,11 @@ def build_localizer(pst_file):
 
     localizer = df.copy()
 
-    sites = list(set([i.split('_')[2] for i in df.index]))
-
-    for s in sites:
-        for ob_type, params in par_relation.items():
-            idx = [i for i in df.index if '{}_{}'.format(ob_type, s) in i]
-            cols = list(np.array([[c for c in df.columns if '{}_{}'.format(p, s) in c] for p in params]).flatten())
-            localizer.loc[idx, cols] = 1.0
+    obs_type = [i.split(':')[1].split('_')[1] for i in df.index]
+    for param, obs in tuning_params.items():
+        idx = [i for t, i in zip(obs_type, df.index) if t == obs]
+        cols = [c for c in df.columns if param in c]
+        localizer.loc[idx, cols] = 1.0
 
     mat_file = os.path.join(os.path.dirname(pst_file), 'loc.mat')
     Matrix.from_dataframe(localizer).to_ascii(mat_file)
@@ -153,13 +149,17 @@ def set_control_settings(pst_file):
 
 
 def params_dict_from_csv(_file):
+
+    q_ins = 'q.ins'
+    swe_ins = 'swe.ins'
+
     q_obs_file = 'obs/obs_q.np'
     swe_obs_file = 'obs/obs_swe.np'
 
     pdct = {'q_obs': {'file': q_obs_file,
-                      'insfile': ins},
+                      'insfile': q_ins},
             'swe_obs': {'file': swe_obs_file,
-                        'insfile': ins},
+                        'insfile': swe_ins},
             }
 
     df = pd.read_csv(_file, header=None)
@@ -183,13 +183,17 @@ def params_dict_from_csv(_file):
 
 
 def params_dict_from_defaults(dst_file):
+
+    q_ins = 'q.ins'
+    swe_ins = 'swe.ins'
+
     q_obs_file = 'obs/obs_q.np'
     swe_obs_file = 'obs/obs_swe.np'
 
     pdct = {'q_obs': {'file': q_obs_file,
-                      'insfile': ins},
+                      'insfile': q_ins},
             'swe_obs': {'file': swe_obs_file,
-                        'insfile': ins},
+                        'insfile': swe_ins},
             }
 
     pars = {}
@@ -204,7 +208,7 @@ def params_dict_from_defaults(dst_file):
     for k, v in dct.items():
         for kk, vv in v.items():
 
-            if kk not in tunable_params:
+            if kk not in tunable_params.keys():
                 continue
 
             try:
@@ -225,6 +229,14 @@ def params_dict_from_defaults(dst_file):
             except TypeError:
                 print('Improper formatting, {}, {}'.format(k, kk))
 
+        a = 1
+
+    missing = []
+    for k in tunable_params:
+        if k not in pars.keys():
+            missing.append(k)
+    print('Consider adding tunable parameters to defaults: {}'.format(missing))
+
     pdct.update({'pars': pars})
     df.dropna(axis=0, how='all', inplace=True)
     df.to_csv(dst_file)
@@ -242,8 +254,6 @@ if __name__ == '__main__':
 
     pp_dir = os.path.join(d, 'pest')
     pest_file = os.path.join(pp_dir, '{}.pst'.format(project))
-
-    ins = '{}.ins'.format(project)
 
     dst_parms_file = os.path.join(d, 'prms_params.csv')
     dct_ = params_dict_from_defaults(dst_parms_file)
