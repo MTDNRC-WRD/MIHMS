@@ -2,9 +2,9 @@ import os
 
 import pandas as pd
 
-from models.models import MontanaPrmsModel
-from prep.prms.xyz_builder import XyzDistBuild
-from utils.plotting import plot_stats
+from mihms.models import MontanaPrmsModel
+from src.mihms.prep.prms.xyz_builder import XyzDistBuild
+from src.mihms.utils import plot_stats
 
 
 def build_model(config, return_model=False):

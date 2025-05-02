@@ -43,6 +43,20 @@ class PRMSConfig:
             self.__dict__[key] = os.path.join(project_folder, model_folder, value)
 
 
+class RWConfig:
+
+    def __init__(self, config_path):
+        try:
+            config_data = toml.load(config_path)
+        except FileNotFoundError:
+            print(f'{config_path} not found')
+            raise ValueError('No config file found!')
+
+        self.run_info = config_data.get('RUN_INFO', {})
+        self.model_info = config_data.get('MODEL_INFO', {})
+
+        self.database_map = toml.load(self.model_info['database_map'])
+
 if __name__ == '__main__':
     pass
 # ========================= EOF ====================================================================

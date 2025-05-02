@@ -9,7 +9,7 @@ from gsflow.control import ControlFile
 from gsflow.output import StatVar
 
 
-class HydroModel():
+class HydroModel:
     def __init__(selfs):
         pass
 
@@ -117,11 +117,27 @@ class prms(HydroModel):
         super().__init__()
 
 
-class rivsysmodel():
+class RivSysModel:
     def __init__(self):
         pass
 
 
-class riverware(rivsysmodel):
+class RiverWare(RivSysModel):
+    def __init__(self, control_file):
+        super().__init__()
+
+    def load_model(self):
+        pass
+
+    def init_dmi(self):
+        pass
+
+class HydraulicModel:
+    def __init__(self):
+        pass
+
+
+class HecRas(HydraulicModel):
+
     def __init__(self):
         super().__init__()

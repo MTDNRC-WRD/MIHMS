@@ -1,0 +1,90 @@
+[gvr_cell_id]
+default = 0
+desc = "Index of the grid cell associated with each gravity reservoir."
+help = "Use with GSFLOW or when mapOutON_OFF = 1 and model_mode is PRMS or PRMS5 when nhru does not equal nhrucell."
+maximum = 'ngwcell'
+minimum = 'bounded'
+modules = [ "GSFLOW", "GSFLOW5", "PRMS", "PRMS5" ]
+type = "I"
+units = "none"
+
+  [gvr_cell_id.dims]
+  0 = "nhrucell"
+
+[gvr_cell_pct]
+default = 0
+desc = "Proportion of the grid-cell area associated with each gravity reservoir."
+help = "Use with GSFLOW or when mapOutON_OFF = 1 and model_mode is PRMS or PRMS5 when nhru does not equal nhrucell."
+maximum = 1
+minimum = 0
+modules = [ "GSFLOW", "GSFLOW5", "PRMS", "PRMS5" ]
+type = "F"
+units = "decimal fraction"
+
+  [gvr_cell_pct.dims]
+  0 = "nhrucell"
+
+[gvr_hru_id]
+default = 1
+desc = "Index of the HRU associated with each gravity reservoir."
+help = "Use with GSFLOW or when mapOutON_OFF = 1 and model_mode is PRMS or PRMS5 when nhru does not equal nhrucell."
+maximum = 'nhru'
+minimum = 1
+modules = [ "GSFLOW", "GSFLOW5", "PRMS", "PRMS5" ]
+type = "I"
+units = "none"
+
+  [gvr_hru_id.dims]
+  0 = "nhrucell"
+
+[gvr_hru_pct]
+default = 0
+desc = "Proportion of the HRU area associated with each gravity reservoir."
+help = "Use with GSFLOW or when mapOutON_OFF = 1 and model_mode is PRMS or PRMS5 when nhru does not equal nhrucell."
+maximum = 1
+minimum = 0
+modules = [ "GSFLOW", "GSFLOW5", "PRMS", "PRMS5" ]
+type = "F"
+units = "decimal fraction"
+
+  [gvr_hru_pct.dims]
+  0 = "nhrucell"
+
+[id_obsrunoff]
+default = 0
+desc = "Index of measured streamflow station corresponding to the basin outlet."
+help = "Index of measured streamflow station corresponding to the basin outlet."
+maximum = 'nobs'
+minimum = 1
+modules = [ "basin" ]
+type = "I"
+units = "none"
+
+  [id_obsrunoff.dims]
+  0 = "one"
+
+[lake_hru_id]
+default = 0
+desc = "Identification number of the lake associated with an HRU; more than one HRU can be associated with each lake."
+help = "Identification number of the lake associated with an HRU; more than one HRU can be associated with each lake."
+maximum = 'nhru'
+minimum = 'bounded'
+modules = [ "muskingum_lake" ]
+type = "I"
+units = "none"
+
+  [lake_hru_id.dims]
+  0 = "nhru"
+
+[mxsziter]
+default = 'MODFLOW MXITER, ITMX, MAXITEROUT'
+desc = "Maximum number of iterations for which soil-zone states are computed."
+help = "Only used in GSFLOW simulations, not required in GSFLOW MODFLOW only simulations."
+maximum = 5_000
+minimum = 0
+modules = [ "GSFLOW", "GSFLOW5" ]
+type = "I"
+units = "none"
+
+  [mxsziter.dims]
+  0 = "one"

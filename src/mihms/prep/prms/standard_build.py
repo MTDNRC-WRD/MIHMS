@@ -1,6 +1,6 @@
 import os
 from copy import copy, deepcopy
-from subprocess import call, Popen, PIPE, STDOUT
+from subprocess import call
 import time
 
 import numpy as np
@@ -24,10 +24,10 @@ from gsflow.builder.builder_defaults import ControlFileDefaults
 from gsflow.builder import builder_utils as bu
 from gsflow.prms.prms_parameter import ParameterRecord
 
-from utils.raster_prep import clip_raster
+from mihms.prep.prms.utils import clip_raster
 
-from models.model_config import PRMSConfig
-from models import PRMS_NOT_REQ
+from mihms.models.model_config import PRMSConfig
+from mihms.models import PRMS_NOT_REQ
 
 register_matplotlib_converters()
 pd.options.mode.chained_assignment = None
@@ -484,6 +484,7 @@ class StandardPrmsBuild:
         for v in vars_:
             self.parameters.add_record_object(v)
 
+    # This really shouldn't be in this class, move to some utility module or the like
     def _prepare_rasters(self):
         """gdal warp is > 10x faster for nearest, here, we resample a single raster using nearest, and use
         that raster's metadata to resample the rest with gdalwarp"""
@@ -530,6 +531,8 @@ class StandardPrmsBuild:
                                          'width': array.shape[1],
                                          'transform': transform})
 
+                # A lot of code to save intermediate files? Should make these intermediate file saves optional
+                #   as an argument only for diagnostic purposes
                 with rasterio.open(example_raster, 'w', **self.raster_meta) as ex:
                     ex.write(array, 1)
                 first = False
@@ -556,6 +559,8 @@ class StandardPrmsBuild:
 
             setattr(self, raster, a)
 
+    # Again move to different location...this is specific to the rasters and should not be included in the
+    #   parameter development process, all this needs to happen before building a PRMS model.
     def _prepare_lookups(self):
         req_remaps = ['covtype.rmp', 'covdenwin.rmp', 'srain_intcp.rmp',
                       'snow_intcp.rmp', 'rtdepth.rmp', 'covdensum.rmp',

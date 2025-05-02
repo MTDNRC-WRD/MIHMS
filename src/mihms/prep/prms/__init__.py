@@ -1,4 +1,6 @@
 import os
+from .domain import *
+from .params import *
 
 NOT_NEEDED_XYZ = ['basin_tsta',
                   'gvr_cell_pct',
@@ -26,6 +28,3 @@ NOT_NEEDED_XYZ = ['basin_tsta',
                   'ssr2gw_sq',
                   'tmax_allrain_sta']
 
-if __name__ == '__main__':
-    pass
-# ========================= EOF ====================================================================

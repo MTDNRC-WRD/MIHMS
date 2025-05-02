@@ -1,0 +1,10 @@
+[RUN_INFO]
+
+[MODEL_INFO]
+database_path = "C:/Users/CNB968/OneDrive - MT/Modeling/Riverware/Models/Tongue River/TRWMM.db"
+database_map = "C:/Users/CNB968/OneDrive - MT/GitHub/MIHMS/example/tongue_R_RSM/tongue_database_map.toml"
+DMI_inputs = [
+    {slot = 'CrossCreekAbvBighorn.Gage Inflow', units = 'cfs', import = 'resize'},
+    {slot = 'CrossCreekAbvBighorn.Gage Outflow', units = 'cfs', import = 'resize'},
+    {slot = 'CrossCreekReservoir.Storage', units = 'acre-feet', import = 'resize'}
+]

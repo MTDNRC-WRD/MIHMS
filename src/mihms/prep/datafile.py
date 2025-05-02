@@ -7,10 +7,10 @@ import numpy as np
 import pandas as pd
 from pandas import read_csv, date_range, to_datetime, isna, DataFrame
 
-from utils.hydrograph import get_station_flows
-from utils.gridmet import gridmet_infill
+from src.mihms.utils import get_station_flows
+from src.mihms.utils import gridmet_infill
 
-from prep.met_data import download_ghcn
+from src.mihms.prep.met_data import download_ghcn
 
 
 def write_basin_datafile(gages, data_file,

@@ -1,0 +1,17 @@
+[[INPUTS]]
+slot = 'CrossCreekAbvBighorn.Gage Inflow'
+column = 'Q_cfs'
+table = 'StreamGageData'
+where = {'siteID' = '0204CC01'}
+
+[[INPUTS]]
+slot = 'CrossCreekAbvBighorn.Gage Outflow'
+column = 'Q_cfs'
+table = 'StreamGageData'
+where = {'siteID' = '0204CC01'}
+
+[[INPUTS]]
+slot = 'CrossCreekReservoir.Storage'
+column = 'Storage_acreft'
+table = 'ReservoirData'
+where = {'siteID' = '0204CCR01'}

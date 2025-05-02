@@ -5,8 +5,7 @@ import os
 
 import numpy as np
 
-from models.models import MontanaPrmsModel
-from prep.prms.xyz_builder import XyzDistBuild
+from mihms.models import MontanaPrmsModel
 
 
 def run_model():

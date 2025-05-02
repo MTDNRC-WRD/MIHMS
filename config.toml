@@ -1,0 +1,4 @@
+[PREP]
+tri_exe = 'bin/triangle.exe'
+tri_working = 'triangle/wdr_temp'
+gdalwarp_exe = 'bin/gdalwarp.exe'

@@ -1,0 +1,3708 @@
+[K_coef]
+default = 1
+desc = "Muskingum storage coefficient"
+help = "Travel time of flood wave from one segment to the next downstream segment, called the Muskingum storage coefficient; enter 1.0 for reservoirs, diversions, and segment(s) flowing out of the basin"
+maximum = 24
+minimum = 0.01
+modules = [ "routing", "streamflow", "muskingum", "muskingum_mann" ]
+type = "F"
+units = "hours"
+
+  [K_coef.dims]
+  0 = "nsegment"
+
+[adjmix_rain]
+default = 1
+desc = "Adjustment factor for rain in a rain/snow mix"
+help = "Monthly (January to December) factor to adjust rain proportion in a mixed rain/snow event"
+maximum = 3
+minimum = 0
+modules = [
+  "precip_1sta",
+  "precip_laps",
+  "precip_dist2",
+  "precipitation_hru"
+]
+type = "F"
+units = "decimal fraction"
+
+  [adjmix_rain.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[albedo]
+default = 0.1
+desc = "Short-wave solar radiation reflected by streams"
+help = "Short-wave solar radiation reflected by streams"
+maximum = 1
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "decimal fraction"
+
+  [albedo.dims]
+  0 = "nhru"
+
+[albset_rna]
+default = 0.8
+desc = "Albedo reset - rain, accumulation stage"
+help = "Fraction of rain in a mixed precipitation event above which the snow albedo is not reset; applied during the snowpack accumulation stage"
+maximum = 1
+minimum = 0.5
+modules = [ "snowcomp" ]
+type = "F"
+units = "decimal fraction"
+
+  [albset_rna.dims]
+  0 = "nhru"
+
+[albset_rnm]
+default = 0.6
+desc = "Albedo reset - rain,  melt stage"
+help = "Fraction of rain in a mixed precipitation event above which the snow albedo is not reset; applied during the snowpack melt stage"
+maximum = 1
+minimum = 0.4
+modules = [ "snowcomp" ]
+type = "F"
+units = "decimal fraction"
+
+  [albset_rnm.dims]
+  0 = "nhru"
+
+[albset_sna]
+default = 0.05
+desc = "Albedo reset - snow, accumulation stage"
+help = "Minimum snowfall, in water equivalent, needed to reset snow albedo during the snowpack accumulation stage"
+maximum = 1
+minimum = 0.01
+modules = [ "snowcomp" ]
+type = "F"
+units = "inches"
+
+  [albset_sna.dims]
+  0 = "nhru"
+
+[albset_snm]
+default = 0.2
+desc = "Albedo reset - snow, melt stage"
+help = "Minimum snowfall, in water equivalent, needed to reset snow albedo during the snowpack melt stage"
+maximum = 1
+minimum = 0.1
+modules = [ "snowcomp" ]
+type = "F"
+units = "inches"
+
+  [albset_snm.dims]
+  0 = "nhru"
+
+[alte]
+default = 0
+desc = "East bank topographic altitude"
+help = "East bank topographic altitude of each segment"
+maximum = 1.57079633
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "radians"
+
+  [alte.dims]
+  0 = "nsegment"
+
+[altw]
+default = 0
+desc = "West bank topographic altitude"
+help = "West bank topographic altitude of each segment"
+maximum = 1.57079633
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "radians"
+
+  [altw.dims]
+  0 = "nsegment"
+
+[azrh]
+default = 0
+desc = "Azimuth angle of each segment, measured clockwise from north"
+help = "Azimuth angle of each segment, measured clockwise from north"
+maximum = 6.28296
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "radians"
+
+  [azrh.dims]
+  0 = "nsegment"
+
+[basin_solsta]
+default = 0
+desc = "Index of main solar radiation station"
+help = "Index of solar radiation station used to compute basin radiation values, used when dimension nsol>0"
+maximum = "nsol"
+minimum = "bounded"
+modules = [ "ccsolrad", "ddsolrad", "solar_radiation_hru" ]
+type = "I"
+units = "none"
+
+  [basin_solsta.dims]
+  0 = "scalar"
+
+[basin_tsta]
+default = 0
+desc = "Index of main temperature station"
+help = "Index of temperature station used to compute basin temperature values"
+maximum = "ntemp"
+minimum = "bounded"
+modules = [ "temp_1sta", "temp_laps", "temp_dist2" ]
+type = "I"
+units = "none"
+
+  [basin_tsta.dims]
+  0 = "scalar"
+
+[carea_max]
+default = 0.6
+desc = "Maximum contributing area"
+help = "Maximum possible area contributing to surface runoff expressed as a portion of the HRU area"
+maximum = 1
+minimum = 0
+modules = [ "srunoff", "srunoff_smidx", "srunoff_carea" ]
+type = "F"
+units = "decimal fraction"
+
+  [carea_max.dims]
+  0 = "nhru"
+
+[carea_min]
+default = 0.2
+desc = "Minimum contributing area"
+help = "Minimum possible area contributing to surface runoff expressed as a portion of the area for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "srunoff_carea" ]
+type = "F"
+units = "decimal fraction"
+
+  [carea_min.dims]
+  0 = "nhru"
+
+[cascade_flg]
+default = 0
+desc = "Flag to indicate cascade type (0=allow many to many; 1=force one to one)"
+help = "Flag to indicate cascade type (0=allow many to many; 1=force one to one)"
+maximum = 1
+minimum = 0
+modules = [ "cascade" ]
+type = "I"
+units = "none"
+
+  [cascade_flg.dims]
+  0 = "scalar"
+
+[cascade_tol]
+default = 5
+desc = "Cascade area below which a cascade link is ignored"
+help = "Cascade area below which a cascade link is ignored"
+maximum = 99
+minimum = 0
+modules = [ "cascade" ]
+type = "F"
+units = "acres"
+
+  [cascade_tol.dims]
+  0 = "scalar"
+
+[ccov_intcp]
+default = 1.83
+desc = "Intercept in temperature cloud cover relationship"
+help = "Monthly (January to December) intercept in cloud-cover relationship"
+maximum = 5
+minimum = 0
+modules = [ "ccsolrad" ]
+type = "F"
+units = "none"
+
+  [ccov_intcp.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[ccov_slope]
+default = -0.13
+desc = "Slope in temperature cloud cover relationship"
+help = "Monthly (January to December) coefficient in cloud-cover relationship"
+maximum = -0.01
+minimum = -0.5
+modules = [ "ccsolrad" ]
+type = "F"
+units = "none"
+
+  [ccov_slope.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[cecn_coef]
+default = 5
+desc = "Monthly convection condensation energy coefficient for each HRU"
+help = "Monthly (January to December) convection condensation energy coefficient for each HRU"
+maximum = 20
+minimum = 0.02
+modules = [ "snowcomp" ]
+type = "F"
+units = "calories per degree Celsius above 0"
+
+  [cecn_coef.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[circle_switch]
+default = 1
+desc = "Switch to check for circles"
+help = "Switch to check for circles (0=no check; 1=check)"
+maximum = 1
+minimum = 0
+modules = [ "cascade" ]
+type = "I"
+units = "none"
+
+  [circle_switch.dims]
+  0 = "scalar"
+
+[cov_type]
+default = 3
+desc = "Cover type designation for HRU"
+help = "Vegetation cover type for each HRU (0=bare soil; 1=grasses; 2=shrubs; 3=trees; 4=coniferous)"
+maximum = 4
+minimum = 0
+modules = [ "basin" ]
+type = "I"
+units = "none"
+
+  [cov_type.dims]
+  0 = "nhru"
+
+[covden_sum]
+default = 0.5
+desc = "Summer vegetation cover density for major vegetation type"
+help = "Summer vegetation cover density for the major vegetation type in each HRU"
+maximum = 1
+minimum = 0
+modules = [ "basin" ]
+type = "F"
+units = "decimal fraction"
+
+  [covden_sum.dims]
+  0 = "nhru"
+
+[covden_win]
+default = 0.5
+desc = "Winter vegetation cover density for major vegetation type"
+help = "Winter vegetation cover density for the major vegetation type in each HRU"
+maximum = 1
+minimum = 0
+modules = [ "basin" ]
+type = "F"
+units = "decimal fraction"
+
+  [covden_win.dims]
+  0 = "nhru"
+
+[crad_coef]
+default = 0.4
+desc = "Coefficient in cloud cover-solar radiation relationship"
+help = "Coefficient(B) in Thompson(1976) equation; varies by region, contour map of values in reference"
+maximum = 0.7
+minimum = 0.1
+modules = [ "ccsolrad" ]
+type = "F"
+units = "none"
+
+  [crad_coef.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[crad_exp]
+default = 0.61
+desc = "Exponent in cloud cover-solar radiation relationship"
+help = "Exponent(P) in Thompson(1976) equation"
+maximum = 0.8
+minimum = 0.2
+modules = [ "ccsolrad" ]
+type = "F"
+units = "none"
+
+  [crad_exp.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[crop_coef]
+default = 1
+desc = "Crop coefficient for each HRU"
+help = "Monthly (January to December) crop coefficient for each HRU"
+maximum = 2
+minimum = 0
+modules = [ "potet_pm", "potet_pm_sta" ]
+type = "F"
+units = "decimal fraction"
+
+  [crop_coef.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[dday_intcp]
+default = -40
+desc = "Intercept in temperature degree-day relationship"
+help = "Monthly (January to December) intercept in degree-day equation for each HRU"
+maximum = 10
+minimum = -60
+modules = [ "ddsolrad" ]
+type = "F"
+units = "dday"
+
+  [dday_intcp.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[dday_slope]
+default = 0.4
+desc = "Slope in temperature degree-day relationship"
+help = "Monthly (January to December) slope in degree-day equation for each HRU"
+maximum = 1.4
+minimum = 0.1
+modules = [ "ddsolrad" ]
+type = "F"
+units = "dday/temp_units"
+
+  [dday_slope.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[den_init]
+default = 0.1
+desc = "Initial density of new-fallen snow"
+help = "Initial density of new-fallen snow"
+maximum = 0.5
+minimum = 0.01
+modules = [ "snowcomp" ]
+type = "F"
+units = "gm/cm3"
+
+  [den_init.dims]
+  0 = "nhru"
+
+[den_max]
+default = 0.6
+desc = "Average maximum snowpack density"
+help = "Average maximum snowpack density"
+maximum = 0.8
+minimum = 0.1
+modules = [ "snowcomp" ]
+type = "F"
+units = "gm/cm3"
+
+  [den_max.dims]
+  0 = "nhru"
+
+[dist_max]
+default = 1_000_000_000
+desc = "Maximum distance from HRU to include a climate station"
+help = "Maximum distance from an HRU to a measurement station for use in calcuations"
+maximum = 1_000_000_000
+minimum = 0
+modules = [ "precip_dist2", "temp_dist2" ]
+type = "F"
+units = "feet"
+
+  [dist_max.dims]
+  0 = "scalar"
+
+[doy]
+desc = "Day of year (1-366)"
+type = "I"
+units = "day index"
+
+  [doy.dims]
+  0 = "ndoy"
+
+[dprst_depth_avg]
+default = 132
+desc = "Average depth of surface depressions at maximum storage capacity"
+help = "Average depth of surface depressions at maximum storage capacity"
+maximum = 500
+minimum = 0
+modules = [ "srunoff", "srunoff_smidx", "srunoff_carea" ]
+type = "F"
+units = "inches"
+
+  [dprst_depth_avg.dims]
+  0 = "nhru"
+
+[dprst_et_coef]
+default = 1
+desc = "Fraction of unsatisfied potential evapotranspiration to apply to surface-depression storage"
+help = "Fraction of unsatisfied potential evapotranspiration to apply to surface-depression storage"
+maximum = 1.5
+minimum = 0.5
+modules = [ "srunoff", "srunoff_smidx", "srunoff_carea" ]
+type = "F"
+units = "decimal fraction"
+
+  [dprst_et_coef.dims]
+  0 = "nhru"
+
+[dprst_flow_coef]
+default = 0.05
+desc = "Coefficient in linear flow routing equation for open surface depressions"
+help = "Coefficient in linear flow routing equation for open surface depressions for each HRU"
+maximum = 0.5
+minimum = 0.00001
+modules = [ "srunoff", "srunoff_smidx", "srunoff_carea" ]
+type = "F"
+units = "fraction/day"
+
+  [dprst_flow_coef.dims]
+  0 = "nhru"
+
+[dprst_frac]
+default = 0
+desc = "Fraction of each HRU area that has surface depressions"
+help = "Fraction of each HRU area that has surface depressions"
+maximum = 0.999
+minimum = 0
+modules = [ "basin" ]
+type = "F"
+units = "decimal fraction"
+
+  [dprst_frac.dims]
+  0 = "nhru"
+
+[dprst_frac_init]
+default = 0.5
+desc = "Fraction of maximum storage that contains water at the start of a simulation"
+help = "Fraction of maximum surface-depression storage that contains water at the start of a simulation"
+maximum = 1
+minimum = 0
+modules = [ "srunoff", "srunoff_smidx", "srunoff_carea" ]
+type = "F"
+units = "decimal fraction"
+
+  [dprst_frac_init.dims]
+  0 = "nhru"
+
+[dprst_frac_open]
+default = 1
+desc = "Fraction of open surface-depression storage area within an HRU that can generate surface runoff as a function of storage volume"
+help = "Fraction of open surface-depression storage area within an HRU that can generate surface runoff as a function of storage volume"
+maximum = 1
+minimum = 0
+modules = [ "basin" ]
+type = "F"
+units = "decimal fraction"
+
+  [dprst_frac_open.dims]
+  0 = "nhru"
+
+[dprst_seep_rate_clos]
+default = 0.02
+desc = "Coefficient used in linear seepage flow equation for closed surface depressions"
+help = "Coefficient used in linear seepage flow equation for closed surface depressions for each HRU"
+maximum = 0.2
+minimum = 0
+modules = [ "srunoff", "srunoff_smidx", "srunoff_carea" ]
+type = "F"
+units = "fraction/day"
+
+  [dprst_seep_rate_clos.dims]
+  0 = "nhru"
+
+[dprst_seep_rate_open]
+default = 0.02
+desc = "Coefficient used in linear seepage flow equation for open surface depressions"
+help = "Coefficient used in linear seepage flow equation for open surface depressions for each HRU"
+maximum = 0.2
+minimum = 0
+modules = [ "srunoff", "srunoff_smidx", "srunoff_carea" ]
+type = "F"
+units = "fraction/day"
+
+  [dprst_seep_rate_open.dims]
+  0 = "nhru"
+
+[elev_outflow]
+default = 0
+desc = "Elevation of the main outflow point"
+help = "Elevation of the main outflow point for each lake using broad-crested weir routing"
+maximum = 10_000
+minimum = -300
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "feet"
+
+  [elev_outflow.dims]
+  0 = "nlake"
+
+[elev_units]
+default = 0
+desc = "Elevation units flag"
+help = "Flag to indicate the units of the elevation values (0=feet; 1=meters)"
+maximum = 1
+minimum = 0
+modules = [ "basin" ]
+type = "I"
+units = "none"
+
+  [elev_units.dims]
+  0 = "scalar"
+
+[elevlake_init]
+default = 1
+desc = "Initial lake surface elevation"
+help = "Initial lake surface elevation for each lake using broad-crested weir or gate opening routing"
+maximum = 10_000
+minimum = -300
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "feet"
+
+  [elevlake_init.dims]
+  0 = "nlake"
+
+[emis_noppt]
+default = 0.757
+desc = "Emissivity of air on days without precipitation for each HRU"
+help = "Average emissivity of air on days without precipitation for each HRU"
+maximum = 1
+minimum = 0.757
+modules = [ "snowcomp" ]
+type = "F"
+units = "decimal fraction"
+
+  [emis_noppt.dims]
+  0 = "nhru"
+
+[epan_coef]
+default = 1
+desc = "Evaporation pan coefficient"
+help = "Monthly (January to December) evaporation pan coefficient for each HRU"
+maximum = 3
+minimum = 0.01
+modules = [ "intcp" ]
+type = "F"
+units = "decimal fraction"
+
+  [epan_coef.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[fall_frost]
+default = 264
+desc = "The solar date (number of days after winter solstice) of the first killing frost of the fall"
+help = "The solar date (number of days after winter solstice) of the first killing frost of the fall"
+maximum = 366
+minimum = 1
+modules = [ "transp_frost" ]
+type = "I"
+units = "Solar date"
+
+  [fall_frost.dims]
+  0 = "nhru"
+
+[fastcoef_lin]
+default = 0.1
+desc = "Linear preferential-flow routing coefficient"
+help = "Linear coefficient in equation to route preferential-flow storage downslope for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "soilzone" ]
+type = "F"
+units = "fraction/day"
+
+  [fastcoef_lin.dims]
+  0 = "nhru"
+
+[fastcoef_sq]
+default = 0.8
+desc = "Non-linear preferential-flow routing coefficient"
+help = "Non-linear coefficient in equation used to route preferential-flow storage downslope for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "soilzone" ]
+type = "F"
+units = "none"
+
+  [fastcoef_sq.dims]
+  0 = "nhru"
+
+[freeh2o_cap]
+default = 0.05
+desc = "Free-water holding capacity of snowpack for each HRU"
+help = "Free-water holding capacity of snowpack for each HRU, expressed as a decimal fraction of the frozen water content of the snowpack (pk_ice)"
+maximum = 0.2
+minimum = 0.01
+modules = [ "snowcomp" ]
+type = "F"
+units = "decimal fraction"
+
+  [freeh2o_cap.dims]
+  0 = "nhru"
+
+[frost_temp]
+default = 28
+desc = "Temperature of killing frost"
+help = "Temperature of killing frost"
+maximum = 32
+minimum = -10
+modules = [ "frost_date" ]
+type = "F"
+units = "temp_units"
+
+  [frost_temp.dims]
+  0 = "nhru"
+
+[gvr_cell_id]
+default = 0
+desc = "Corresponding grid cell id associated with each GVR"
+help = "Index of the grid cell associated with each gravity reservoir"
+maximum = "nhrucell"
+minimum = "bounded"
+modules = [ "map_results" ]
+type = "I"
+units = "none"
+
+  [gvr_cell_id.dims]
+  0 = "nhrucell"
+
+[gvr_cell_pct]
+default = 0
+desc = "Proportion of the grid cell associated with each GVR"
+help = "Proportion of the grid cell area associated with each gravity reservoir"
+maximum = 1
+minimum = 0
+modules = [ "map_results" ]
+type = "F"
+units = "decimal fraction"
+
+  [gvr_cell_pct.dims]
+  0 = "nhrucell"
+
+[gvr_hru_id]
+default = 0
+desc = "Corresponding HRU id of each GVR"
+help = "Index of the HRU associated with each gravity reservoir"
+maximum = "nhru"
+minimum = "bounded"
+modules = [ "soilzone", "map_results" ]
+type = "I"
+units = "none"
+
+  [gvr_hru_id.dims]
+  0 = "nhrucell"
+
+[gw_down_id]
+default = 0
+desc = "GWR index of downslope GWR"
+help = "Index number of the downslope GWR to which the upslope GWR contributes flow"
+maximum = "nhru"
+minimum = "bounded"
+modules = [ "cascade" ]
+type = "I"
+units = "none"
+
+  [gw_down_id.dims]
+  0 = "ncascdgw"
+
+[gw_init]
+default = 1
+desc = "Initial groundwater temperature"
+help = "Initial temperature of groundwater entering each segment; recommended value equal to long-term average air temperature"
+maximum = 45
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "degrees Celsius"
+
+  [gw_init.dims]
+  0 = "nsegment"
+
+[gw_pct_up]
+default = 1
+desc = "Fraction of GWR area associated with cascade area"
+help = "Fraction of GWR area used to compute flow contributed to a downslope GWR or stream segment for cascade area"
+maximum = 1
+minimum = 0
+modules = [ "cascade" ]
+type = "F"
+units = "decimal fraction"
+
+  [gw_pct_up.dims]
+  0 = "ncascdgw"
+
+[gw_seep_coef]
+default = 0.015
+desc = "Linear coefficient to compute seepage and groundwater discharge to and from associated lake HRUs"
+help = "Linear coefficient in equation to compute lakebed seepage to the GWR and groundwater discharge to each lake using broad-crested weir routing or gate opening routing"
+maximum = 0.05
+minimum = 0.001
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "fraction/day"
+
+  [gw_seep_coef.dims]
+  0 = "nhru"
+
+[gw_strmseg_down_id]
+default = 0
+desc = "Stream segment index that cascade area contributes flow"
+help = "Index number of the stream segment that cascade area contributes flow"
+maximum = "nsegment"
+minimum = "bounded"
+modules = [ "cascade" ]
+type = "I"
+units = "none"
+
+  [gw_strmseg_down_id.dims]
+  0 = "ncascdgw"
+
+[gw_tau]
+default = 365
+desc = "Average residence time in groundwater flow"
+help = "Average residence time in subsurface flow"
+maximum = 365
+minimum = 1
+modules = [ "stream_temp" ]
+type = "I"
+units = "days"
+
+  [gw_tau.dims]
+  0 = "nsegment"
+
+[gw_up_id]
+default = 0
+desc = "Index of GWR containing cascade area"
+help = "Index of GWR containing cascade area"
+maximum = "nhru"
+minimum = "bounded"
+modules = [ "cascade" ]
+type = "I"
+units = "none"
+
+  [gw_up_id.dims]
+  0 = "ncascdgw"
+
+[gwflow_coef]
+default = 0.015
+desc = "Groundwater routing coefficient"
+help = "Linear coefficient in the equation to compute groundwater discharge for each GWR"
+maximum = 0.5
+minimum = 0
+modules = [ "gwflow" ]
+type = "F"
+units = "fraction/day"
+
+  [gwflow_coef.dims]
+  0 = "nhru"
+
+[gwsink_coef]
+default = 0
+desc = "Groundwater sink coefficient"
+help = "Linear coefficient in the equation to compute outflow to the groundwater sink for each GWR"
+maximum = 1
+minimum = 0
+modules = [ "gwflow" ]
+type = "F"
+units = "fraction/day"
+
+  [gwsink_coef.dims]
+  0 = "nhru"
+
+[gwstor_init]
+default = 2
+desc = "Initial storage in each GWR"
+help = "Storage in each GWR at the beginning of a simulation"
+maximum = 50
+minimum = 0
+modules = [ "gwflow" ]
+type = "F"
+units = "inches"
+
+  [gwstor_init.dims]
+  0 = "nhru"
+
+[gwstor_min]
+default = 0
+desc = "Minimum storage in each GWR"
+help = "Minimum storage in each GWR to ensure storage is greater than specified value to account for inflow from deep aquifers or injection wells with the water source outside the basin"
+maximum = 1
+minimum = 0
+modules = [ "gwflow" ]
+type = "F"
+units = "inches"
+
+  [gwstor_min.dims]
+  0 = "nhru"
+
+[hamon_coef]
+default = 0.0055
+desc = "Monthly air temperature coefficient - Hamon"
+help = "Monthly (January to December) air temperature coefficient used in Hamon potential ET computations for each HRU"
+maximum = 0.008
+minimum = 0.004
+modules = [ "potet_hamon" ]
+type = "F"
+units = "none"
+
+  [hamon_coef.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[hru_area]
+default = 1
+desc = "HRU area"
+help = "Area of each HRU"
+maximum = 1_000_000_000
+minimum = 0.0001
+modules = [ "basin", "convert_params" ]
+type = "F"
+units = "acres"
+
+  [hru_area.dims]
+  0 = "nhru"
+
+[hru_aspect]
+default = 0
+desc = "HRU aspect"
+help = "Aspect of each HRU"
+maximum = 360
+minimum = 0
+modules = [ "basin" ]
+type = "F"
+units = "angular degrees"
+
+  [hru_aspect.dims]
+  0 = "nhru"
+
+[hru_deplcrv]
+default = 1
+desc = "Index number for snowpack areal depletion curve"
+help = "Index number for the snowpack areal depletion curve associated with each HRU"
+maximum = "ndepl"
+minimum = "bounded"
+modules = [ "snowcomp" ]
+type = "I"
+units = "none"
+
+  [hru_deplcrv.dims]
+  0 = "nhru"
+
+[hru_down_id]
+default = 0
+desc = "HRU index of downslope HRU"
+help = "Index number of the downslope HRU to which the upslope HRU contributes flow"
+maximum = "nhru"
+minimum = "bounded"
+modules = [ "cascade" ]
+type = "I"
+units = "none"
+
+  [hru_down_id.dims]
+  0 = "ncascade"
+
+[hru_elev]
+default = 0
+desc = "HRU mean elevation"
+help = "Mean elevation for each HRU"
+maximum = 30_000
+minimum = -1_000
+modules = [ "basin" ]
+type = "F"
+units = "elev_units"
+
+  [hru_elev.dims]
+  0 = "nhru"
+
+[hru_humidity_sta]
+default = 0
+desc = "Index of humidity measurement station for each HRU"
+help = "Index of humidity measurement station for each HRU"
+maximum = "nhumid"
+minimum = "bounded"
+modules = [ "potet_pm_sta" ]
+type = "I"
+units = "none"
+
+  [hru_humidity_sta.dims]
+  0 = "nhru"
+
+[hru_in_to_cf]
+default = "None"
+desc = "Conversion of inches of depth to cubic feet for each HRU"
+help = "Conversion of inches of depth to cubic feet for each HRU"
+maximum = "Large"
+minimum = "zero"
+type = "F"
+units = "cubic feet"
+
+  [hru_in_to_cf.dims]
+  0 = "nhru"
+
+[hru_lat]
+default = 40
+desc = "HRU latitude"
+help = "Latitude of each HRU"
+maximum = 90
+minimum = -90
+modules = [ "basin" ]
+type = "F"
+units = "degrees North"
+
+  [hru_lat.dims]
+  0 = "nhru"
+
+[hru_lon]
+default = -105
+desc = "HRU longitude"
+help = "Longitude of each HRU"
+maximum = 360
+minimum = -360
+modules = [ "basin" ]
+type = "F"
+units = "degrees East"
+
+  [hru_lon.dims]
+  0 = "nhru"
+
+[hru_pansta]
+default = 0
+desc = "Index of pan evaporation station for each HRU"
+help = "Index of pan evaporation station used to compute HRU potential ET"
+maximum = "nevap"
+minimum = "bounded"
+modules = [ "potet_pan" ]
+type = "I"
+units = "none"
+
+  [hru_pansta.dims]
+  0 = "nhru"
+
+[hru_pct_up]
+default = 1
+desc = "Fraction of HRU area associated with cascade area"
+help = "Fraction of HRU area used to compute flow contributed to a downslope HRU or stream segment for cascade area"
+maximum = 1
+minimum = 0
+modules = [ "cascade" ]
+type = "F"
+units = "decimal fraction"
+
+  [hru_pct_up.dims]
+  0 = "ncascade"
+
+[hru_percent_imperv]
+default = 0
+desc = "HRU percent impervious"
+help = "Fraction of each HRU area that is impervious"
+maximum = 0.999
+minimum = 0
+modules = [ "basin" ]
+type = "F"
+units = "decimal fraction"
+
+  [hru_percent_imperv.dims]
+  0 = "nhru"
+
+[hru_plaps]
+default = 0
+desc = "Index of precipitation station to lapse against hru_psta"
+help = "Index of the lapse precipitation measurement station used for lapse rate calculations for each HRU"
+maximum = "nrain"
+minimum = "bounded"
+modules = [ "precip_1sta_laps" ]
+type = "I"
+units = "none"
+
+  [hru_plaps.dims]
+  0 = "nhru"
+
+[hru_psta]
+default = 0
+desc = "Index of base precipitation station for HRU"
+help = "Index of the base precipitation station used for lapse rate calculations for each HRU"
+maximum = "nrain"
+minimum = "bounded"
+modules = [ "precip_1sta_laps" ]
+type = "I"
+units = "none"
+
+  [hru_psta.dims]
+  0 = "nhru"
+
+[hru_segment]
+default = 0
+desc = "Segment index for HRU lateral inflows"
+help = "Segment index to which an HRU contributes lateral flows (surface runoff, interflow, and groundwater discharge)"
+maximum = "nsegment"
+minimum = "bounded"
+modules = [ "routing", "streamflow", "strmflow_in_out", "muskingum" ]
+type = "I"
+units = "none"
+
+  [hru_segment.dims]
+  0 = "nhru"
+
+[hru_segment_nhm]
+default = 0
+desc = "NHM segment index for HRU lateral inflows"
+help = "NHM segment index to which an HRU contributes lateral flows (surface runoff, interflow, and groundwater discharge)"
+maximum = "nsegment"
+minimum = "bounded"
+modules = [ "routing", "streamflow", "strmflow_in_out", "muskingum" ]
+type = "I"
+units = "none"
+
+  [hru_segment_nhm.dims]
+  0 = "nhru"
+
+[hru_slope]
+default = 0
+desc = "HRU slope"
+help = "Slope of each HRU, specified as change in vertical length divided by change in horizontal length"
+maximum = 10
+minimum = 0
+modules = [ "basin" ]
+type = "F"
+units = "decimal fraction"
+
+  [hru_slope.dims]
+  0 = "nhru"
+
+[hru_solsta]
+default = 0
+desc = "Index of solar radiation station associated with each HRU"
+help = "Index of solar radiation station associated with each HRU"
+maximum = "nsol"
+minimum = "bounded"
+modules = [ "ccsolrad", "ddsolrad", "solar_radiation_hru" ]
+type = "I"
+units = "none"
+
+  [hru_solsta.dims]
+  0 = "nhru"
+
+[hru_strmseg_down_id]
+default = 0
+desc = "Stream segment index that cascade area contributes flow"
+help = "Index number of the stream segment that cascade area contributes flow"
+maximum = "nsegment"
+minimum = "bounded"
+modules = [ "cascade" ]
+type = "I"
+units = "none"
+
+  [hru_strmseg_down_id.dims]
+  0 = "ncascade"
+
+[hru_subbasin]
+default = 0
+desc = "Index of subbasin assigned to each HRU"
+help = "Index of subbasin assigned to each HRU"
+maximum = "nsub"
+minimum = "bounded"
+modules = [ "subbasin", "nsub_summary" ]
+type = "I"
+units = "none"
+
+  [hru_subbasin.dims]
+  0 = "nhru"
+
+[hru_tlaps]
+default = 0
+desc = "Index of lapse temperature station for HRU"
+help = "Index of the lapse temperature station used for lapse rate calculations"
+maximum = "ntemp"
+minimum = "bounded"
+modules = [ "temp_1sta_laps" ]
+type = "I"
+units = "none"
+
+  [hru_tlaps.dims]
+  0 = "nhru"
+
+[hru_tsta]
+default = 0
+desc = "Index of base temperature station for HRU"
+help = "Index of the base temperature station used for lapse rate calculations"
+maximum = "ntemp"
+minimum = "bounded"
+modules = [ "temp_1sta", "temp_laps" ]
+type = "I"
+units = "none"
+
+  [hru_tsta.dims]
+  0 = "nhru"
+
+[hru_type]
+default = 1
+desc = "HRU type"
+help = "Type of each HRU (0=inactive; 1=land; 2=lake; 3=swale)"
+maximum = 3
+minimum = 0
+modules = [ "basin" ]
+type = "I"
+units = "none"
+
+  [hru_type.dims]
+  0 = "nhru"
+
+[hru_up_id]
+default = 0
+desc = "Index of HRU containing cascade area"
+help = "Index of HRU containing cascade area"
+maximum = "nhru"
+minimum = "bounded"
+modules = [ "cascade" ]
+type = "I"
+units = "none"
+
+  [hru_up_id.dims]
+  0 = "ncascade"
+
+  [hru_up_id.requires]
+  control = "cascade_flag=1"
+  dimension = "ncascade>0"
+
+[hru_windspeed_sta]
+default = 0
+desc = "Index of wind speed measurement station for each HRU"
+help = "Index of wind speed measurement station for each HRU"
+maximum = "nwind"
+minimum = "bounded"
+modules = [ "potet_pm_sta" ]
+type = "I"
+units = "none"
+
+  [hru_windspeed_sta.dims]
+  0 = "nhru"
+
+[hru_x]
+default = 0
+desc = "X for each HRU (albers)"
+help = "Longitude (X) for each HRU in albers projection"
+maximum = 10_000_000
+minimum = -10_000_000
+modules = [ "setup_param" ]
+type = "F"
+units = "meters"
+
+  [hru_x.dims]
+  0 = "nhru"
+
+[hru_xlong]
+default = 0
+desc = "HRU longitude of centroid, State Plane"
+help = "Longitude of each HRU for the centroid, State Plane Coordinate System"
+maximum = 1_000_000_000
+minimum = -1_000_000_000
+modules = [ "precip_dist2", "temp_dist2" ]
+type = "F"
+units = "feet"
+
+  [hru_xlong.dims]
+  0 = "nhru"
+
+[hru_y]
+default = 0
+desc = "Y for each HRU (albers)"
+help = "Latitude (Y) for each HRU in albers projection"
+maximum = 10_000_000
+minimum = -10_000_000
+modules = [ "setup_param" ]
+type = "F"
+units = "meters"
+
+  [hru_y.dims]
+  0 = "nhru"
+
+[hru_ylat]
+default = 0
+desc = "HRU latitude of centroid, State Plane"
+help = "Latitude of each HRU for the centroid, State Plane Coordinate System"
+maximum = 1_000_000_000
+minimum = -1_000_000_000
+modules = [ "precip_dist2", "temp_dist2" ]
+type = "F"
+units = "feet"
+
+  [hru_ylat.dims]
+  0 = "nhru"
+
+[hs_krs]
+default = 0.0135
+desc = "Potential ET adjustment factor - Hargreaves-Samani"
+help = "Monthly (January to December) adjustment factor used in Hargreaves-Samani potential ET computations for each HRU"
+maximum = 0.24
+minimum = 0.01
+modules = [ "potet_hs" ]
+type = "F"
+units = "decimal fraction"
+
+  [hs_krs.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[humidity_percent]
+default = 0
+desc = "Monthy humidity for each HRU"
+help = "Monthy humidity for each HRU"
+maximum = 100
+minimum = 0
+modules = [
+  "potet_hru",
+  "potet_hamon",
+  "potet_hs",
+  "potet_jh",
+  "potet_pan",
+  "potet_pm",
+  "potet_pm_sta",
+  "potet_pt"
+]
+type = "F"
+units = "percentage"
+
+  [humidity_percent.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[imperv_stor_max]
+default = 0.05
+desc = "HRU maximum impervious area retention storage"
+help = "Maximum impervious area retention storage for each HRU"
+maximum = 0.5
+minimum = 0
+modules = [ "srunoff", "srunoff_area", "srunoff_smidx" ]
+type = "F"
+units = "inches"
+
+  [imperv_stor_max.dims]
+  0 = "nhru"
+
+[irr_type]
+default = 0
+desc = "Method of application of water for each application"
+help = "Method of application of water for each application time-series (0=sprinkler (interception applies); 1=furrow/drip (no intercept); 2=ignore)"
+maximum = 2
+minimum = 0
+modules = [ "intcp" ]
+type = "I"
+units = "none"
+
+  [irr_type.dims]
+  0 = "nhru"
+
+[jh_coef]
+default = 0.014
+desc = "Monthly air temperature coefficient for each HRU - Jensen-Haise"
+help = "Monthly (January to December) air temperature coefficient used in Jensen-Haise potential ET computations for each HRU"
+maximum = 1.5
+minimum = -0.5
+modules = [ "potet_jh" ]
+type = "F"
+units = "per degrees Fahrenheit"
+
+  [jh_coef.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[jh_coef_hru]
+default = 13
+desc = "HRU air temperature coefficient - Jensen-Haise"
+help = "Air temperature coefficient used in Jensen-Haise potential ET computations for each HRU"
+maximum = 150
+minimum = -99
+modules = [ "potet_jh" ]
+type = "F"
+units = "degrees Fahrenheit"
+
+  [jh_coef_hru.dims]
+  0 = "nhru"
+
+[lake_coef]
+default = 0.1
+desc = "Linear lake routing coefficient"
+help = "Coefficient in equation to route storage to streamflow for each lake using linear routing"
+maximum = 1
+minimum = 0.0001
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "fraction/day"
+
+  [lake_coef.dims]
+  0 = "nlake"
+
+[lake_din1]
+default = 0.1
+desc = "Initial inflow to each lake"
+help = "Initial inflow to each lake using Puls or linear storage routing"
+maximum = 10_000_000
+minimum = 0
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "cfs"
+
+  [lake_din1.dims]
+  0 = "nlake"
+
+[lake_evap_adj]
+default = 1
+desc = "Monthly potet factor to adjust potet on lakes"
+help = "Monthly (January to December) adjustment factor for potential ET for each lake"
+maximum = 1
+minimum = 0.5
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "decimal fraction"
+
+  [lake_evap_adj.dims]
+  0 = "nmonth"
+  1 = "nlake"
+
+[lake_hru_id]
+default = 0
+desc = "Identification number of the lake associated with an HRU"
+help = "Identification number of the lake associated with an HRU; more than one HRU can be associated with each lake"
+maximum = "nlake"
+minimum = "bounded"
+modules = [ "muskingum_lake" ]
+type = "I"
+units = "none"
+
+  [lake_hru_id.dims]
+  0 = "nhru"
+
+[lake_init]
+default = 0
+desc = "Initial storage in each lake"
+help = "Initial storage in each lake using Puls or linear storage routing"
+maximum = 10_000_000
+minimum = 0
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "cfs-days"
+
+  [lake_init.dims]
+  0 = "nlake"
+
+[lake_out2]
+default = 0
+desc = "Switch to specify a second outlet from a lake"
+help = "Switch to specify a second outlet from each lake using gate opening routing (0=no; 1=yes)"
+maximum = 1
+minimum = 0
+modules = [ "muskingum_lake" ]
+type = "I"
+units = "none"
+
+  [lake_out2.dims]
+  0 = "nlake"
+
+[lake_out2_a]
+default = 1
+desc = "Outflow coefficient A for each lake with second outlet"
+help = "Coefficient A in outflow equation for each lake with a second outlet using gate opening routing"
+maximum = 10_000
+minimum = 0
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "cfs/ft"
+
+  [lake_out2_a.dims]
+  0 = "nlake"
+
+[lake_out2_b]
+default = 100
+desc = "Outflow coefficient A for each lake with second outlet"
+help = "Coefficient B in outflow equation for each lake with a second outlet using gate opening routing"
+maximum = 10_000
+minimum = 0
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "cfs"
+
+  [lake_out2_b.dims]
+  0 = "nlake"
+
+[lake_qro]
+default = 0.1
+desc = "Initial daily mean outflow from each lake"
+help = "Initial daily mean outflow from each lake"
+maximum = 10_000_000
+minimum = 0
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "cfs"
+
+  [lake_qro.dims]
+  0 = "nlake"
+
+[lake_seep_elev]
+default = 1
+desc = "Elevation over which lakebed seepage to the GWR occurs"
+help = "Elevation over which lakebed seepage to the GWR occurs for lake HRUs using broad-crested weir routing or gate opening routing"
+maximum = 10_000
+minimum = -300
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "feet"
+
+  [lake_seep_elev.dims]
+  0 = "nlake"
+
+[lake_segment_id]
+default = 0
+desc = "Index of lake associated with a segment"
+help = "Index of lake associated with a segment"
+maximum = "nlake"
+minimum = "bounded"
+modules = [ "muskingum_lake" ]
+type = "I"
+units = "none"
+
+  [lake_segment_id.dims]
+  0 = "nsegment"
+
+[lake_type]
+default = 1
+desc = "Type of lake routing method"
+help = "Type of lake routing method (1=Puls routing; 2=linear routing; 3=flow through; 4=broad crested weir; 5=gate opening; 6=measured flow)"
+maximum = 6
+minimum = 1
+modules = [ "muskingum_lake" ]
+type = "I"
+units = "none"
+
+  [lake_type.dims]
+  0 = "nlake"
+
+[lake_vol_init]
+default = 0
+desc = "Initial lake volume"
+help = "Initial lake volume for each lake using broad-crested weir or gate opening routing"
+maximum = 10_000_000
+minimum = 0
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "acre-feet"
+
+  [lake_vol_init.dims]
+  0 = "nlake"
+
+[lapsemax_max]
+default = 2
+desc = "Monthly maximum lapse rate for maximum temperature"
+help = "Monthly (January to December) maximum lapse rate to constrain lowest maximum lapse rate on the basis of historical daily air temperatures for all air-temperature measurement stations"
+maximum = 3
+minimum = -3
+modules = [ "temp_dist2" ]
+type = "F"
+units = "temp_units/feet"
+
+  [lapsemax_max.dims]
+  0 = "nmonth"
+
+[lapsemax_min]
+default = -6.5
+desc = "Monthly minimum lapse rate for maximum temperature"
+help = "Monthly (January to December) maximum lapse rate to constrain lowest minimum lapse rate on the basis of historical daily air temperatures for all air-temperature measurement stations"
+maximum = -3
+minimum = -7
+modules = [ "temp_dist2" ]
+type = "F"
+units = "temp_units/feet"
+
+  [lapsemax_min.dims]
+  0 = "nmonth"
+
+[lapsemin_max]
+default = 3
+desc = "Monthly maximum lapse rate for minimum temperature"
+help = "Monthly (January to December) minimum lapse rate to constrain lowest maximum lapse rate on the basis of historical daily air temperatures for all air-temperature measurement stations"
+maximum = 4
+minimum = -2
+modules = [ "temp_dist2" ]
+type = "F"
+units = "temp_units/feet"
+
+  [lapsemin_max.dims]
+  0 = "nmonth"
+
+[lapsemin_min]
+default = -4
+desc = "Monthly minimum lapse rate for minimum temperature"
+help = "Monthly (January to December) minimum lapse rate to constrain lowest minimum lapse rate on the basis of historical daily air temperatures for all air-temperature measurement stations"
+maximum = -3
+minimum = -7
+modules = [ "temp_dist2" ]
+type = "F"
+units = "temp_units/feet"
+
+  [lapsemin_min.dims]
+  0 = "nmonth"
+
+[lat_temp_adj]
+default = 0
+desc = "Correction factor to adjust the bias of the temperature of the lateral inflow"
+help = "Correction factor to adjust the bias of the temperature of the lateral inflow"
+maximum = 5
+minimum = -5
+modules = [ "stream_temp" ]
+type = "F"
+units = "decimal fraction"
+
+  [lat_temp_adj.dims]
+  0 = "nmonth"
+  1 = "nsegment"
+
+[mann_n]
+default = 0.04
+desc = "Manning's roughness coefficient"
+help = "Manning's roughness coefficient for each segment"
+maximum = 0.15
+minimum = 0.001
+model = "PRMS"
+modules = [ "muskingum_mann", "mizuroute" ]
+type = "F"
+units = "seconds / meter ** (1/3)"
+
+  [mann_n.dims]
+  0 = "nsegment"
+
+[mapvars_freq]
+default = 0
+desc = "Mapped results frequency"
+help = "Flag to specify the output frequency (0=none; 1=monthly; 2=yearly; 3=total; 4=monthly and yearly; 5=monthly, yearly, and total; 6=weekly; 7=daily)"
+maximum = 7
+minimum = 0
+modules = [ "map_results" ]
+type = "I"
+units = "none"
+
+  [mapvars_freq.dims]
+  0 = "scalar"
+
+[mapvars_units]
+default = 0
+desc = "Flag to specify the output units of mapped results"
+help = "Flag to specify the output units of mapped results (0=units of the variable; 1=inches to feet; 2=inches to centimeters; 3=inches to meters; as states or fluxes)"
+maximum = 3
+minimum = 0
+modules = [ "map_results" ]
+type = "I"
+units = "none"
+
+  [mapvars_units.dims]
+  0 = "scalar"
+
+[max_missing]
+default = 3
+desc = "Maximum number of consecutive missing values allowed for any air-temperature-measurement station; 0=unlimited"
+help = "Maximum number of consecutive missing values allowed for any air-temperature-measurement station; missing value set to last valid value; 0=unlimited"
+maximum = 10
+minimum = 0
+modules = [ "temp_1sta_laps" ]
+type = "I"
+units = "none"
+
+  [max_missing.dims]
+  0 = "scalar"
+
+[max_psta]
+default = 0
+desc = "Maximum number of precipitation stations to distribute to an HRU"
+help = "Maximum number of precipitation measurement stations to distribute to an HRU"
+maximum = "nrain"
+minimum = "bounded"
+modules = [ "precip_dist2" ]
+type = "I"
+units = "none"
+
+  [max_psta.dims]
+  0 = "scalar"
+
+[max_tsta]
+default = 0
+desc = "Maximum number of temperature stations to use for distributing temperature to any HRU"
+help = "Maximum number of air-temperature measurement stations to use for distributing temperature to any HRU"
+maximum = "ntemp"
+minimum = "bounded"
+modules = [ "temp_dist2" ]
+type = "I"
+units = "none"
+
+  [max_tsta.dims]
+  0 = "scalar"
+
+[maxday_prec]
+default = 15
+desc = "Maximum daily precipitation for any weather site"
+help = "Maximum measured precipitation value above which precipitation is assumed to be in error"
+maximum = 20
+minimum = 0
+modules = [ "precip_dist2" ]
+type = "F"
+units = "precip_units"
+
+  [maxday_prec.dims]
+  0 = "scalar"
+
+[maxiter_sntemp]
+default = 1_000
+desc = "Maximum number of Newton-Raphson iterations to compute stream temperature"
+help = "Maximum number of Newton-Raphson iterations to compute stream temperature"
+maximum = 2_000
+minimum = 10
+modules = [ "stream_temp" ]
+type = "I"
+units = "none"
+
+  [maxiter_sntemp.dims]
+  0 = "scalar"
+
+[melt_force]
+default = 140
+desc = "Julian date to force snowpack to spring snowmelt stage for each HRU"
+help = "Julian date to force snowpack to spring snowmelt stage for each HRU; varies with region depending on length of time that permanent snowpack exists"
+maximum = 366
+minimum = 1
+modules = [ "snowcomp" ]
+type = "I"
+units = "Julian day"
+
+  [melt_force.dims]
+  0 = "nhru"
+
+[melt_look]
+default = 90
+desc = "Julian date to start looking for spring snowmelt for each HRU"
+help = "Julian date to start looking for spring snowmelt stage for each HRU; varies with region depending on length of time that permanent snowpack exists"
+maximum = 366
+minimum = 1
+modules = [ "snowcomp" ]
+type = "I"
+units = "Julian day"
+
+  [melt_look.dims]
+  0 = "nhru"
+
+[melt_temp]
+default = 1.5
+desc = "Temperature at which snowmelt enters a stream"
+help = "Temperature at which snowmelt enters a stream"
+maximum = 10
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "degrees Celsius"
+
+  [melt_temp.dims]
+  0 = "scalar"
+
+[monmax]
+default = 100
+desc = "Daily maximum temperature"
+help = "Monthly maximum air temperature to constrain lowest minimum measured air temperatures for bad values based on historical temperature for all measurement stations"
+maximum = 115
+minimum = 0
+modules = [ "temp_dist2" ]
+type = "F"
+units = "temp_units"
+
+  [monmax.dims]
+  0 = "nmonth"
+
+[monmin]
+default = -60
+desc = "Daily minimum temperature"
+help = "Monthly minimum air temperature to constrain lowest minimum measured air temperatures for bad values based on historical temperature for all measurement stations"
+maximum = 65
+minimum = -60
+modules = [ "temp_dist2" ]
+type = "F"
+units = "temp_units"
+
+  [monmin.dims]
+  0 = "nmonth"
+
+[ncol]
+default = 1
+desc = "Number of columns for each row of the mapped results"
+help = "Number of columns for each row of the mapped results"
+maximum = 50_000
+minimum = 1
+modules = [ "map_results" ]
+type = "I"
+units = "none"
+
+  [ncol.dims]
+  0 = "scalar"
+
+[nhm_deplcrv]
+default = 1
+desc = "NHM index number for snowpack areal depletion curve"
+help = "NHM index number for the snowpack areal depletion curve associated with each HRU"
+maximum = "ndepl"
+minimum = "bounded"
+modules = [ "snowcomp" ]
+type = "I"
+units = "none"
+
+  [nhm_deplcrv.dims]
+  0 = "nhru"
+
+[nhm_id]
+default = 1
+desc = "National Hydrologic Model HRU ID"
+help = "National Hydrologic Model HRU ID"
+maximum = 9_999_999
+minimum = 1
+modules = [ "basin", "setup_param", "nhru_summary" ]
+type = "I"
+units = "none"
+
+  [nhm_id.dims]
+  0 = "nhru"
+
+[nhm_seg]
+default = 0
+desc = "National Hydrologic Model segment ID"
+help = "National Hydrologic Model segment ID"
+maximum = 9_999_999
+minimum = 0
+modules = [ "basin", "setup_param", "nsegment_summary" ]
+type = "I"
+units = "none"
+
+  [nhm_seg.dims]
+  0 = "nsegment"
+
+[nsos]
+default = 0
+desc = "Number of storage/outflow values in table for Puls routing"
+help = "Number of storage/outflow values in table for each lake using Puls routing"
+maximum = "mxnsos"
+minimum = "bounded"
+modules = [ "muskingum_lake" ]
+type = "I"
+units = "none"
+
+  [nsos.dims]
+  0 = "nlake"
+
+[o2]
+default = 0
+desc = "Outflow values in outflow/storage tables for Puls routing"
+help = "Outflow values in outflow/storage tables for each lake using Puls routing"
+maximum = 10_000_000
+minimum = 0
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "cfs"
+
+  [o2.dims]
+  0 = "mxnsos"
+  1 = "nlake"
+
+[obsin_segment]
+default = 0
+desc = "Index of measured streamflow station that replaces inflow to a segment"
+help = "Index of measured streamflow station that replaces inflow to a segment"
+maximum = "nobs"
+minimum = "bounded"
+modules = [ "routing", "streamflow", "muskingum" ]
+type = "I"
+units = "none"
+
+  [obsin_segment.dims]
+  0 = "nsegment"
+
+[obsout_lake]
+default = 0
+desc = "Index of streamflow measurement station that specifies outflow from a lake"
+help = "Index of streamflow measurement station that specifies outflow from each lake using measured flow replacement"
+maximum = "nobs"
+minimum = "bounded"
+modules = [ "muskingum_lake" ]
+type = "I"
+units = "none"
+
+  [obsout_lake.dims]
+  0 = "nlake"
+
+[obsout_segment]
+default = 0
+desc = "Index of measured streamflow station that replaces outflow from a segment"
+help = "Index of measured streamflow station that replaces outflow from a segment"
+maximum = "nobs"
+minimum = "bounded"
+modules = [ "routing", "streamflow", "muskingum" ]
+type = "I"
+units = "none"
+
+  [obsout_segment.dims]
+  0 = "nsegment"
+
+[op_flow_thres]
+default = 1
+desc = "Fraction of open depression storage above which surface runoff occurs for each timestep"
+help = "Fraction of open depression storage above which surface runoff occurs; any water above maximum open storage capacity spills as surface runoff"
+maximum = 1
+minimum = 0.01
+modules = [ "srunoff", "srunoff_smidx", "srunoff_carea" ]
+type = "F"
+units = "decimal fraction"
+
+  [op_flow_thres.dims]
+  0 = "nhru"
+
+[outlet_sta]
+default = 0
+desc = "Index of measurement station to use for basin outlet"
+help = "Index of measured streamflow station corresponding to the basin outlet"
+maximum = "nobs"
+minimum = "bounded"
+modules = [ "basin_sum" ]
+type = "I"
+units = "none"
+
+  [outlet_sta.dims]
+  0 = "scalar"
+
+[padj_rn]
+default = 1
+desc = "Rain adjustment factor, by month for each precipitation station"
+help = "Monthly (January to December) factor to adjust precipitation lapse rate computed between station hru_psta and station hru_plaps; positive factors are mutiplied times the lapse rate and negative factors are made positive and substituted for the computed lapse rate"
+maximum = 10
+minimum = -2
+modules = [ "precip_1sta_laps" ]
+type = "F"
+units = "precip_units"
+
+  [padj_rn.dims]
+  0 = "nrain"
+  1 = "nmonth"
+
+[padj_sn]
+default = 1
+desc = "Snow adjustment factor, by month for each precipitation station"
+help = "Monthly (January to December) factor to adjust precipitation lapse rate computed between station hru_psta and station hru_plaps; positive factors are mutiplied times the lapse rate and negative factors are made positive and substituted for the computed lapse rate"
+maximum = 10
+minimum = -2
+modules = [ "precip_1sta_laps" ]
+type = "F"
+units = "precip_units"
+
+  [padj_sn.dims]
+  0 = "nmonth"
+  1 = "nrain"
+
+[parent_gw]
+default = 1
+desc = "Lumen index in parent model for each GWR"
+help = "Lumen index in parent model for each GWR"
+maximum = 9_999_999
+minimum = 1
+modules = [ "setup_param" ]
+type = "I"
+units = "none"
+
+  [parent_gw.dims]
+  0 = "nhru"
+
+[parent_hru]
+default = 1
+desc = "Lumen index in parent model for each HRU"
+help = "Lumen index in parent model for each HRU"
+maximum = 9_999_999
+minimum = 1
+modules = [ "setup_param" ]
+type = "I"
+units = "none"
+
+  [parent_hru.dims]
+  0 = "nhru"
+
+[parent_poigages]
+default = 0
+desc = "Lumen index in parent model for each POI gage"
+help = "Lumen index in parent model for each POI gage"
+maximum = 9_999_999
+minimum = 0
+modules = [ "setup_param", "prms_summary" ]
+type = "I"
+units = "none"
+
+  [parent_poigages.dims]
+  0 = "npoigages"
+
+[parent_segment]
+default = 0
+desc = "Lumen index in parent model for each segment"
+help = "Lumen index in parent model for each segment"
+maximum = 9_999_999
+minimum = 0
+modules = [ "setup_param" ]
+type = "I"
+units = "none"
+
+  [parent_segment.dims]
+  0 = "nsegment"
+
+[parent_ssr]
+default = 1
+desc = "Lumen index in parent model for each SSR"
+help = "Lumen index in parent model  for each SSR"
+maximum = 99_999_999
+minimum = 1
+modules = [ "setup_param" ]
+type = "I"
+units = "none"
+
+  [parent_ssr.dims]
+  0 = "nhru"
+
+[pm_d_coef]
+default = 0.34
+desc = "Penman-Monteith coefficient"
+help = "Monthly (January to December) Penman-Monteith potential ET D wind-speed coefficient for each HRU"
+maximum = 0.45
+minimum = 0.25
+modules = [ "potet_pm", "potet_pm_sta" ]
+type = "F"
+units = "seconds/meters"
+
+  [pm_d_coef.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[pm_n_coef]
+default = 900
+desc = "Penman-Monteith coefficient"
+help = "Monthly (January to December) Penman-Monteith potential ET N temperauture coefficient for each HRU"
+maximum = 950
+minimum = 850
+modules = [ "potet_pm", "potet_pm_sta" ]
+type = "F"
+units = "degrees Celsius per day"
+
+  [pm_n_coef.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[pmn_mo]
+default = 1
+desc = "Mean monthly precipitation for each lapse precipitation station"
+help = "Mean monthly (January to December) precipitation for each lapse precipitation measurement station"
+maximum = 100
+minimum = 0.00001
+modules = [ "precip_1sta_laps" ]
+type = "F"
+units = "precip_units"
+
+  [pmn_mo.dims]
+  0 = "nmonth"
+  1 = "nrain"
+
+[poi_gage_id]
+desc = "POI Gage ID"
+help = "USGS stream gage for each POI gage"
+maximum = 9_999_999
+minimum = 0
+modules = [ "basin", "prms_summary" ]
+type = "S"
+units = "none"
+
+  [poi_gage_id.dims]
+  0 = "npoigages"
+
+[poi_gage_segment]
+default = 0
+desc = "Segment index for each POI gage"
+help = "Segment index for each POI gage"
+maximum = "nsegment"
+minimum = "bounded"
+modules = [ "basin", "prms_summary" ]
+type = "I"
+units = "none"
+
+  [poi_gage_segment.dims]
+  0 = "npoigages"
+
+[poi_type]
+default = 1
+desc = "Type code for each POI gage"
+help = "Type code for each POI gage"
+maximum = 1
+minimum = 0
+modules = [ "basin" ]
+type = "I"
+units = "none"
+
+  [poi_type.dims]
+  0 = "npoigages"
+
+[potet_cbh_adj]
+default = 1
+desc = "Potential ET adjustment factor, by month for each HRU"
+help = "Monthly (January to December) adjustment factor to potential evapotranspiration specified in CBH Files for each HRU"
+maximum = 1.5
+minimum = 0.5
+modules = [ "potet_hru" ]
+type = "F"
+units = "decimal fraction"
+
+  [potet_cbh_adj.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[potet_sublim]
+default = 0.5
+desc = "Fraction of potential ET that is sublimated from snow for each HRU"
+help = "Fraction of potential ET that is sublimated from snow in the canopy and snowpack for each HRU"
+maximum = 0.75
+minimum = 0.1
+modules = [ "snowcomp" ]
+type = "F"
+units = "decimal fraction"
+
+  [potet_sublim.dims]
+  0 = "nhru"
+
+[ppt_rad_adj]
+default = 0.02
+desc = "Radiation reduced if HRU precipitation above this value"
+help = "Monthly minimum precipitation, if HRU precipitation exceeds this value, radiation is multiplied by radj_sppt or radj_wppt adjustment factor"
+maximum = 0.5
+minimum = 0
+modules = [ "ccsolrad", "ddsolrad", "solar_radiation_hru" ]
+type = "F"
+units = "inches"
+
+  [ppt_rad_adj.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[ppt_zero_thresh]
+default = 0
+desc = "The zero threshold for precipitation"
+help = "The minimum/zero threhold for precipitation"
+maximum = 0
+minimum = 0
+modules = "None"
+type = "F"
+units = "inches"
+
+  [ppt_zero_thresh.dims]
+  0 = "scalar"
+
+[precip_units]
+default = 0
+desc = "Units for measured precipitation"
+help = "Units for measured precipitation (0=inches; 1=mm)"
+maximum = 1
+minimum = 0
+modules = [
+  "precip_1sta",
+  "precip_laps",
+  "precip_dist2",
+  "precipitation_hru"
+]
+type = "I"
+units = "none"
+
+  [precip_units.dims]
+  0 = "scalar"
+
+[pref_flow_den]
+default = 0
+desc = "Fraction of the soil zone in which preferential flow occurs for each HRU"
+help = "Fraction of the soil zone in which preferential flow occurs for each HRU"
+maximum = 0.5
+minimum = 0
+modules = [ "soilzone" ]
+type = "F"
+units = "decimal fraction"
+
+  [pref_flow_den.dims]
+  0 = "nhru"
+
+[pref_flow_infil_frac]
+default = -1
+desc = "Fraction of the soilwater infiltration partitioned to the preferential reservoir storage for each HRU"
+help = "Fraction of the soilwater infiltration partitioned to the preferential reservoir storage for each HRU. Default -1  makes it backwards compatible by setting pref_flow_infil_frac to pref_flow_den."
+maximum = 1
+minimum = 0
+modules = [ "soilzone" ]
+type = "F"
+units = "decimal fraction"
+
+  [pref_flow_infil_frac.dims]
+  0 = "nhru"
+
+[print_freq]
+default = 3
+desc = "Frequency for the output frequency"
+help = "Flag to select the output frequency; for combinations, add index numbers, e.g., daily plus yearly = 10; yearly plus total = 3 (0=none; 1=run totals; 2=yearly; 4=monthly; 8=daily; or additive combinations)"
+maximum = 15
+minimum = 0
+modules = [ "basin_sum" ]
+type = "I"
+units = "none"
+
+  [print_freq.dims]
+  0 = "scalar"
+
+[print_type]
+default = 1
+desc = "Type of output written to output file"
+help = "Flag to select the type of results written to the output file (0=measured and simulated flow only; 1=water balance table; 2=detailed output)"
+maximum = 2
+minimum = 0
+modules = [ "basin_sum" ]
+type = "I"
+units = "none"
+
+  [print_type.dims]
+  0 = "scalar"
+
+[psta_elev]
+default = 0
+desc = "Precipitation station elevation"
+help = "Elevation of each precipitation measurement station"
+maximum = 30_000
+minimum = -300
+modules = [ "ide_dist", "xyz_dist", "precip_laps" ]
+type = "F"
+units = "elev_units"
+
+  [psta_elev.dims]
+  0 = "nrain"
+
+[psta_mon]
+default = 1
+desc = "Monthly precipitation for each of the nrain precipitation measurement stations"
+help = "Monthly (January to December) factor to precipitation at each measured station to adjust precipitation distributed to each HRU to account for differences in elevation, and so forth"
+maximum = 50
+minimum = 1.0e-07
+modules = [ "precip_dist2" ]
+type = "F"
+units = "precip_units"
+
+  [psta_mon.dims]
+  0 = "nmonth"
+  1 = "nrain"
+
+[psta_xlong]
+default = 0
+desc = "Precipitation station longitude, State Plane"
+help = "Longitude of each precipitation measurement station, State Plane Coordinate System"
+maximum = 1_000_000_000
+minimum = -1_000_000_000
+modules = [ "precip_dist2" ]
+type = "F"
+units = "feet"
+
+  [psta_xlong.dims]
+  0 = "nrain"
+
+[psta_ylat]
+default = 0
+desc = "Precipitation station latitude, State Plane"
+help = "Latitude of each precipitation measurement station, State Plane Coordinate System"
+maximum = 1_000_000_000
+minimum = -1_000_000_000
+modules = [ "precip_dist2" ]
+type = "F"
+units = "feet"
+
+  [psta_ylat.dims]
+  0 = "nrain"
+
+[pt_alpha]
+default = 1.26
+desc = "Potential ET adjustment factor - Priestly-Taylor"
+help = "Monthly (January to December) adjustment factor used in Priestly-Taylor potential ET computations for each HRU"
+maximum = 2
+minimum = 1
+modules = [ "potet_pt" ]
+type = "F"
+units = "decimal fraction"
+
+  [pt_alpha.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[rad_conv]
+default = 1
+desc = "Conversion factor to Langleys for measured solar radiation"
+help = "Conversion factor to Langleys for measured solar radiation"
+maximum = 100
+minimum = 0.1
+modules = [ "ccsolrad", "ddsolrad", "solar_radiation_hru" ]
+type = "F"
+units = "Langleys/radiation units"
+
+  [rad_conv.dims]
+  0 = "scalar"
+
+[rad_trncf]
+default = 0.5
+desc = "Solar radiation transmission coefficient"
+help = "Transmission coefficient for short-wave radiation through the winter vegetation canopy"
+maximum = 1
+minimum = 0
+modules = [ "snowcomp" ]
+type = "F"
+units = "decimal fraction"
+
+  [rad_trncf.dims]
+  0 = "nhru"
+
+[radadj_intcp]
+default = 1
+desc = "Intercept in air temperature range adjustment to degree-day equation"
+help = "Monthly (January to December) intercept in air temperature range adjustment to degree-day equation for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "ddsolrad" ]
+type = "F"
+units = "dday"
+
+  [radadj_intcp.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[radadj_slope]
+default = 0
+desc = "Slope in air temperature range adjustment to degree-day equation"
+help = "Monthly (January to December) slope in air temperature range adjustment to degree-day equation for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "ddsolrad" ]
+type = "F"
+units = "dday/temp_units"
+
+  [radadj_slope.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[radj_sppt]
+default = 0.44
+desc = "Adjustment to solar radiation on precipitation day - summer"
+help = "Adjustment factor for computed solar radiation for summer day with greater than ppt_rad_adj inches of precipitation for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "ccsolrad", "ddsolrad", "solar_radiation_hru" ]
+type = "F"
+units = "decimal fraction"
+
+  [radj_sppt.dims]
+  0 = "nhru"
+
+[radj_wppt]
+default = 0.5
+desc = "Adjustment to solar radiation on precipitation day - winter"
+help = "Adjustment factor for computed solar radiation for winter day with greater than ppt_rad_adj inches of precipitation for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "ccsolrad", "ddsolrad", "solar_radiation_hru" ]
+type = "F"
+units = "decimal fraction"
+
+  [radj_wppt.dims]
+  0 = "nhru"
+
+[radmax]
+default = 0.8
+desc = "Maximum fraction of potential solar radiation"
+help = "Monthly (January to December) maximum fraction of the potential solar radiation that may reach the ground due to haze, dust, smog, and so forth, for each HRU"
+maximum = 1
+minimum = 0.1
+modules = [ "ccsolrad", "ddsolrad", "solar_radiation_hru" ]
+type = "F"
+units = "decimal fraction"
+
+  [radmax.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[rain_adj]
+default = 1
+desc = "Monthly rain adjustment factor for each HRU"
+help = "Monthly (January to December) factor to adjust measured precipitation on each HRU to account for differences in elevation, and so forth"
+maximum = 2.5
+minimum = 0.5
+modules = [ "precip_1sta_laps" ]
+type = "F"
+units = "decimal fraction"
+
+  [rain_adj.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[rain_cbh_adj]
+default = 1
+desc = "Rain adjustment factor, by month for each HRU"
+help = "Monthly (January to December) adjustment factor to measured precipitation determined to be rain on each HRU to account for differences in elevation, and so forth"
+maximum = 2
+minimum = 0.5
+modules = [ "precipitation_hru" ]
+type = "F"
+units = "decimal fraction"
+
+  [rain_cbh_adj.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[rain_code]
+default = 2
+desc = "Flag indicating rule for precipitation station use"
+help = "Monthly (January to December) flag indicating rule for precipitation measurement station use (1=only precipitation if the regression stations have precipitation; 2=only precipitation if any station in the basin has precipitation; 3=precipitation if xyz says so; 4=only precipitation if rain_day variable is set to 1; 5=only precipitation if psta_freq_nuse stations have precipitation)"
+maximum = 5
+minimum = 1
+modules = [ "xyz_dist" ]
+type = "I"
+units = "none"
+
+  [rain_code.dims]
+  0 = "nmonth"
+
+[rain_mon]
+default = 1
+desc = "Rain adjustment factor, by month for each HRU"
+help = "Monthly (January to December) factor to rain on each HRU to adjust precipitation distributed to each HRU to account for differences in elevation, and so forth"
+maximum = 50
+minimum = 0
+modules = [ "precip_dist2" ]
+type = "F"
+units = "precip_units"
+
+  [rain_mon.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[rate_table]
+default = 5
+desc = "Rating table 1 with stage (rows) and gate opening (cols)"
+help = "Rating table with stage (rows) and gate opening (cols) for rating table 1 for lakes using gate opening routing and nratetbl>0"
+maximum = 1_000
+minimum = -100
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "cfs"
+
+  [rate_table.dims]
+  0 = "nstage"
+  1 = "ngate"
+
+[rate_table2]
+default = 5
+desc = "Rating table 2 with stage (rows) and gate opening (cols)"
+help = "Rating table with stage (rows) and gate opening (cols) for rating table 2 for lakes using gate opening routing and nratetbl>1"
+maximum = 1_000
+minimum = -100
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "cfs"
+
+  [rate_table2.dims]
+  0 = "nstage2"
+  1 = "ngate2"
+
+[rate_table3]
+default = 5
+desc = "Rating table 3 with stage (rows) and gate opening (cols)"
+help = "Rating table with stage (rows) and gate opening (cols) for rating table 3 for lakes using gate opening routing and nratetbl>2"
+maximum = 1_000
+minimum = -100
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "cfs"
+
+  [rate_table3.dims]
+  0 = "nstage3"
+  1 = "ngate3"
+
+[rate_table4]
+default = 5
+desc = "Rating table 4 with stage (rows) and gate opening (cols)"
+help = "Rating table with stage (rows) and gate opening (cols) for rating table 4 for lakes using gate opening routing and nratetbl>3"
+maximum = 1_000
+minimum = -100
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "cfs"
+
+  [rate_table4.dims]
+  0 = "nstage4"
+  1 = "ngate4"
+
+[ratetbl_lake]
+default = 0
+desc = "Index of lake associated with each rating table"
+help = "Index of lake associated with each rating table for each lake using gate opening routing"
+maximum = "nlake"
+minimum = "bounded"
+modules = [ "muskingum_lake" ]
+type = "I"
+units = "none"
+
+  [ratetbl_lake.dims]
+  0 = "nratetbl"
+
+[runoff_units]
+default = 0
+desc = "Measured streamflow units"
+help = "Measured streamflow units (0=cfs; 1=cms)"
+maximum = 1
+minimum = 0
+modules = [ "obs" ]
+type = "I"
+units = "none"
+
+  [runoff_units.dims]
+  0 = "scalar"
+
+[s2]
+default = 0
+desc = "Storage values in outflow/storage tables for Puls routing"
+help = "Storage values in outflow/storage table for each lake using Puls routing"
+maximum = 10_000_000
+minimum = 0
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "cfs-days"
+
+  [s2.dims]
+  0 = "mxnsos"
+  1 = "nlake"
+
+[sat_threshold]
+default = 999
+desc = "Soil saturation threshold, above field-capacity threshold"
+help = "Water holding capacity of the gravity and preferential-flow reservoirs; difference between field capacity and total soil saturation for each HRU"
+maximum = 999
+minimum = 0.00001
+modules = [ "soilzone", "convert_params" ]
+type = "F"
+units = "inches"
+
+  [sat_threshold.dims]
+  0 = "nhru"
+
+[seg_cum_area]
+default = "NaN"
+desc = "Segment cumulative area"
+help = "Segment cumulative area"
+maximum = "NaN"
+minimum = 0
+model = "PRMS"
+modules = [ "none" ]
+type = "F"
+units = "unknown"
+
+  [seg_cum_area.dims]
+  0 = "nsegment"
+
+[seg_depth]
+default = 1
+desc = "Depth of bankfull water in segment"
+help = "Width of segment"
+maximum = 250
+minimum = 0.03
+model = "PRMS"
+modules = [ "muskingum_mann" ]
+type = "F"
+units = "meter"
+
+  [seg_depth.dims]
+  0 = "nsegment"
+
+[seg_elev]
+default = 0
+desc = "Segment elevation at midpoint"
+help = "Segment elevation at midpoint"
+maximum = 30_000
+minimum = -1_000
+modules = [ "stream_temp" ]
+type = "F"
+units = "meters"
+
+  [seg_elev.dims]
+  0 = "nsegment"
+
+[seg_humidity]
+default = 0.7
+desc = "Mean monthly humidity for each segment"
+help = "Mean monthly humidity for each segment, used when values not input in CBH file"
+maximum = 1
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "decimal fraction"
+
+  [seg_humidity.dims]
+  0 = "nmonth"
+  1 = "nsegment"
+
+[seg_humidity_sta]
+default = 0
+desc = "Index of humidity measurement station for each stream segment"
+help = "Index of humidity measurement station for each stream segment"
+maximum = "nhumid"
+minimum = "bounded"
+modules = [ "stream_temp" ]
+type = "I"
+units = "none"
+
+  [seg_humidity_sta.dims]
+  0 = "nsegment"
+
+[seg_lat]
+default = 40
+desc = "Segment latitude"
+help = "Latitude of each segment"
+maximum = 90
+minimum = -90
+modules = [ "stream_temp" ]
+type = "F"
+units = "degrees north"
+
+  [seg_lat.dims]
+  0 = "nsegment"
+
+[seg_length]
+default = 1_000
+desc = "Length of each segment"
+help = "Length of each segment, bounds based on CONUS"
+maximum = 200_000
+minimum = 0.001
+modules = [ "strmflow", "muskingum_mann", "mizuroute", "stream_temp" ]
+type = "F"
+units = "meters"
+
+  [seg_length.dims]
+  0 = "nsegment"
+
+[seg_slope]
+default = 0.0001
+desc = "Surface slope of each segment"
+help = "Surface slope of each segment"
+maximum = 2
+minimum = 1.0e-07
+modules = [ "strmflow", "muskingum_mann", "mizuroute", "stream_temp" ]
+type = "F"
+units = "decimal fraction"
+
+  [seg_slope.dims]
+  0 = "nsegment"
+
+[seg_summer_humidity]
+default = 0.7
+desc = "Summer humidity for each segment"
+help = "Summer humidity for each segment, used when values not input in CBH File"
+maximum = 1
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "decimal fraction"
+
+  [seg_summer_humidity.dims]
+  0 = "nsegment"
+
+[seg_width]
+default = 15
+desc = "Segment river width"
+help = "Segment river width, narrowest observed from Zimmerman 1967, Amazon biggest"
+maximum = 40_000
+minimum = 0.18
+model = "PRMS"
+modules = [ "mizuroute" ]
+type = "F"
+units = "meter"
+
+  [seg_width.dims]
+  0 = "nsegment"
+
+[seg_winter_humidity]
+default = 0.5
+desc = "Winter humidity for each segment"
+help = "Winter humidity for each segment, used when values not input in CBH File"
+maximum = 1
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "decimal fraction"
+
+  [seg_winter_humidity.dims]
+  0 = "nsegment"
+
+[segment_flow_init]
+default = 0
+desc = "Initial flow in each stream segment"
+help = "Initial flow in each stream segment"
+maximum = 10_000_000
+minimum = 0
+modules = [ "muskingum", "muskingum_lake", "muskingum_mann" ]
+type = "F"
+units = "cfs"
+
+  [segment_flow_init.dims]
+  0 = "nsegment"
+
+[segment_type]
+default = 0
+desc = "Segment type"
+help = "Segment type (0=segment; 1=headwater; 2=lake; 3=replace inflow; 4=inbound to NHM; 5=outbound from NHM; 6=inbound to region; 7=outbound from region; 8=drains to ocean; 9=sink; 10=inbound from Great Lakes; 11=outbound to Great Lakes)"
+maximum = 111
+minimum = 0
+modules = [ "routing", "streamflow", "muskingum" ]
+type = "I"
+units = "none"
+
+  [segment_type.dims]
+  0 = "nsegment"
+
+[segshade_sum]
+default = 0
+desc = "Total shade fraction for summer vegetation"
+help = "Total shade fraction for summer vegetation; required when stream_temp_flag=1"
+maximum = 1
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "decimal fraction"
+
+  [segshade_sum.dims]
+  0 = "nsegment"
+
+[segshade_win]
+default = 0
+desc = "Total shade fraction for winter vegetation"
+help = "Total shade fraction for winter vegetation; required when stream_temp_flag=1"
+maximum = 1
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "decimal fraction"
+
+  [segshade_win.dims]
+  0 = "nsegment"
+
+[settle_const]
+default = 0.1
+desc = "Snowpack settlement time constant"
+help = "Snowpack settlement time constant"
+maximum = 0.5
+minimum = 0.01
+modules = [ "snowcomp" ]
+type = "F"
+units = "decimal fraction"
+
+  [settle_const.dims]
+  0 = "nhru"
+
+[slowcoef_lin]
+default = 0.015
+desc = "Linear gravity-flow reservoir routing coefficient"
+help = "Linear coefficient in equation to route gravity-reservoir storage downslope for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "soilzone" ]
+type = "F"
+units = "fraction/day"
+
+  [slowcoef_lin.dims]
+  0 = "nhru"
+
+[slowcoef_sq]
+default = 0.1
+desc = "Non-linear gravity-flow reservoir routing coefficient"
+help = "Non-linear coefficient in equation to route gravity-reservoir storage downslope for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "soilzone" ]
+type = "F"
+units = "none"
+
+  [slowcoef_sq.dims]
+  0 = "nhru"
+
+[smidx_coef]
+default = 0.005
+desc = "Coefficient in contributing area computations"
+help = "Coefficient in non-linear contributing area algorithm for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "srunoff", "srunoff_smidx" ]
+type = "F"
+units = "decimal fraction"
+
+  [smidx_coef.dims]
+  0 = "nhru"
+
+[smidx_exp]
+default = 0.3
+desc = "Exponent in contributing area computations"
+help = "Exponent in non-linear contributing area algorithm for each HRU"
+maximum = 5
+minimum = 0
+modules = [ "srunoff", "srunoff_smidx" ]
+type = "F"
+units = "1.0/inch"
+
+  [smidx_exp.dims]
+  0 = "nhru"
+
+[snarea_curve]
+default = 1
+desc = "Snow area depletion curve values"
+help = "Snow area depletion curve values, 11 values for each curve (0.0 to 1.0 in 0.1 increments)"
+maximum = 1
+minimum = 0
+modules = [ "snowcomp" ]
+type = "F"
+units = "decimal fraction"
+
+  [snarea_curve.dims]
+  0 = "ndeplval"
+
+[snarea_thresh]
+default = 50
+desc = "Maximum threshold water equivalent for snow depletion"
+help = "Maximum threshold snowpack water equivalent below which the snow-covered-area curve is applied"
+maximum = 200
+minimum = 0
+modules = [ "snowcomp" ]
+type = "F"
+units = "inches"
+
+  [snarea_thresh.dims]
+  0 = "nhru"
+
+[snow_adj]
+default = 1
+desc = "Monthly snow adjustment factor for each HRU"
+help = "Monthly (January to December) factor to adjust measured precipitation on each HRU to account for differences in elevation, and so forth"
+maximum = 2.5
+minimum = 0.5
+modules = [ "precip_1sta_laps" ]
+type = "F"
+units = "decimal fraction"
+
+  [snow_adj.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[snow_cbh_adj]
+default = 1
+desc = "Snow adjustment factor, by month for each HRU"
+help = "Monthly (January to December) adjustment factor to measured precipitation determined to be snow on each HRU to account for differences in elevation, and so forth"
+maximum = 2
+minimum = 0.5
+modules = [ "precipitation_hru" ]
+type = "F"
+units = "decimal fraction"
+
+  [snow_cbh_adj.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[snow_intcp]
+default = 0.1
+desc = "Snow interception storage capacity"
+help = "Snow interception storage capacity for the major vegetation type in each HRU"
+maximum = 1
+minimum = 0
+modules = [ "intcp" ]
+type = "F"
+units = "inches"
+
+  [snow_intcp.dims]
+  0 = "nhru"
+
+[snow_mon]
+default = 1
+desc = "Rain adjustment factor, by month for each HRU"
+help = "Monthly (January to December) factor to snow on each HRU to adjust precipitation distributed to each HRU to account for differences in elevation, and so forth"
+maximum = 50
+minimum = 0
+modules = [ "precip_dist2" ]
+type = "F"
+units = "precip_units"
+
+  [snow_mon.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[snowinfil_max]
+default = 2
+desc = "Maximum snow infiltration per day"
+help = "Maximum snow infiltration per day for each HRU"
+maximum = 20
+minimum = 0
+modules = [ "srunoff", "srunoff_area", "srunoff_smidx" ]
+type = "F"
+units = "inches/day"
+
+  [snowinfil_max.dims]
+  0 = "nhru"
+
+[snowpack_init]
+default = 0
+desc = "Initial snowpack water equivalent in each HRU"
+help = "Storage of snowpack in each HRU at the beginning of a simulation"
+maximum = 5_000
+minimum = 0
+modules = [ "snowcomp" ]
+type = "F"
+units = "inches"
+
+  [snowpack_init.dims]
+  0 = "nhru"
+
+[soil2gw_max]
+default = 0
+desc = "Maximum value for capillary reservoir excess to GWR"
+help = "Maximum amount of the capillary reservoir excess that is routed directly to the GWR for each HRU"
+maximum = 5
+minimum = 0
+modules = [ "soilzone" ]
+type = "F"
+units = "inches"
+
+  [soil2gw_max.dims]
+  0 = "nhru"
+
+[soil_moist_init_frac]
+default = 0
+desc = "Initial fraction available water in the capillary reservoir"
+help = "Initial fraction of available water in the capillary reservoir (fraction of soil_moist_max for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "soilzone", "convert_params" ]
+type = "F"
+units = "decimal fraction"
+
+  [soil_moist_init_frac.dims]
+  0 = "nhru"
+
+[soil_moist_max]
+default = 2
+desc = "Maximum value of water for soil zone"
+help = "Maximum available water holding capacity of capillary reservoir from land surface to rooting depth of the major vegetation type of each HRU"
+maximum = 20
+minimum = 0.00001
+modules = [ "soilzone", "convert_params" ]
+type = "F"
+units = "inches"
+
+  [soil_moist_max.dims]
+  0 = "nhru"
+
+[soil_rechr_init_frac]
+default = 0
+desc = "Initial fraction of available water in the soil recharge zone within the capillary reservoir"
+help = "Initial fraction of available water in the capillary reservoir where losses occur as both evaporation and transpiration (upper zone of capillary reservoir) for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "soilzone", "convert_params" ]
+type = "F"
+units = "decimal fraction"
+
+  [soil_rechr_init_frac.dims]
+  0 = "nhru"
+
+[soil_rechr_max_frac]
+default = 1
+desc = "Fraction of capillary reservoir where losses occur as both evaporation and transpiration (soil recharge zone)"
+help = "Fraction of the capillary reservoir water-holding capacity (soil_moist_max) where losses occur as both evaporation and transpiration (upper zone of capillary reservoir) for each HRU"
+maximum = 1
+minimum = 0.00001
+modules = [ "soilzone", "convert_params" ]
+type = "F"
+units = "decimal fraction"
+
+  [soil_rechr_max_frac.dims]
+  0 = "nhru"
+
+[soil_type]
+default = 2
+desc = "HRU soil type"
+help = "Soil type of each HRU (1=sand; 2=loam; 3=clay)"
+maximum = 3
+minimum = 1
+modules = [ "soilzone" ]
+type = "I"
+units = "none"
+
+  [soil_type.dims]
+  0 = "nhru"
+
+[spring_frost]
+default = 111
+desc = "The solar date (number of days after winter solstice) of the last killing frost of the spring"
+help = "The solar date (number of days after winter solstice) of the last killing frost of the spring"
+maximum = 366
+minimum = 1
+modules = [ "transp_frost" ]
+type = "I"
+units = "Solar date"
+
+  [spring_frost.dims]
+  0 = "nhru"
+
+[srain_intcp]
+default = 0.1
+desc = "Summer rain interception storage capacity"
+help = "Summer rain interception storage capacity for the major vegetation type in each HRU"
+maximum = 1
+minimum = 0
+modules = [ "intcp" ]
+type = "F"
+units = "inches"
+
+  [srain_intcp.dims]
+  0 = "nhru"
+
+[sro_to_dprst_imperv]
+default = 0.2
+desc = "Fraction of impervious surface runoff that flows into surface-depression storage"
+help = "Fraction of impervious surface runoff that flows into surface-depression storage; the remainder flows to a stream network for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "srunoff", "srunoff_smidx", "srunoff_carea" ]
+type = "F"
+units = "decimal fraction"
+
+  [sro_to_dprst_imperv.dims]
+  0 = "nhru"
+
+[sro_to_dprst_perv]
+default = 0.2
+desc = "Fraction of pervious surface runoff that flows into surface-depression storage"
+help = "Fraction of pervious surface runoff that flows into surface-depression storage; the remainder flows to a stream network for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "srunoff", "srunoff_smidx", "srunoff_carea" ]
+type = "F"
+units = "decimal fraction"
+
+  [sro_to_dprst_perv.dims]
+  0 = "nhru"
+
+[ss_init]
+default = 15
+desc = "Initial interflow temperature"
+help = "Initial temperature of interflow entering each segment; recommended value equal to long-term average air temperature"
+maximum = 45
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "degrees Celsius"
+
+  [ss_init.dims]
+  0 = "nsegment"
+
+[ss_tau]
+default = 30
+desc = "Average residence time of subsurface interflow"
+help = "Average residence time of subsurface interflow"
+maximum = 365
+minimum = 1
+modules = [ "stream_temp" ]
+type = "I"
+units = "days"
+
+  [ss_tau.dims]
+  0 = "nsegment"
+
+[ssr2gw_exp]
+default = 1
+desc = "Coefficient to route water from subsurface to groundwater"
+help = "Non-linear coefficient in equation used to route water from the gravity reservoir to the GWR for each HRU"
+maximum = 3
+minimum = 0
+modules = [ "soilzone" ]
+type = "F"
+units = "none"
+
+  [ssr2gw_exp.dims]
+  0 = "nhru"
+
+[ssr2gw_rate]
+default = 0.1
+desc = "Coefficient to route water from gravity reservoir to GWR"
+help = "Linear coefficient in equation used to route water from the gravity reservoir to the GWR for each HRU"
+maximum = 1
+minimum = 0.0001
+modules = [ "soilzone" ]
+type = "F"
+units = "fraction/day"
+
+  [ssr2gw_rate.dims]
+  0 = "nhru"
+
+[ssstor_init_frac]
+default = 0
+desc = "Initial fraction of available water in the gravity plus preferential-flow reservoirs"
+help = "Initial fraction of available water in the gravity plus preferential-flow reservoirs (fraction of sat_threshold) for each HRU"
+maximum = 1
+minimum = 0
+modules = [ "soilzone", "convert_params" ]
+type = "F"
+units = "decimal fraction"
+
+  [ssstor_init_frac.dims]
+  0 = "nhru"
+
+[stream_tave_init]
+default = "NaN"
+desc = "Cold-start stream average stream temperature"
+help = "Cold-start stream average stream temperature"
+maximum = "unbounded"
+minimum = "unbounded"
+modules = "None"
+type = "F"
+units = "unknown"
+
+  [stream_tave_init.dims]
+  0 = "scalar"
+
+[subbasin_down]
+default = 0
+desc = "Downstream subbasin for each subbasin"
+help = "Index number for the downstream subbasin whose inflow is outflow from this subbasin"
+maximum = "nsub"
+minimum = "bounded"
+modules = [ "subbasin" ]
+type = "I"
+units = "none"
+
+  [subbasin_down.dims]
+  0 = "nsub"
+
+[tbl_gate]
+default = 0
+desc = "Gate openings for each column of rating table 1"
+help = "Gate openings for each column for rating table 1 for lakes using gate opening routing and nratetbl>0"
+maximum = 20
+minimum = 0
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "inches"
+
+  [tbl_gate.dims]
+  0 = "ngate"
+
+[tbl_gate2]
+default = 0
+desc = "Gate openings for each column of rating table 2"
+help = "Gate openings for each column for rating table 2 for lakes using gate opening routing and nratetbl>1"
+maximum = 20
+minimum = 0
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "inches"
+
+  [tbl_gate2.dims]
+  0 = "ngate2"
+
+[tbl_gate3]
+default = 0
+desc = "Gate openings for each column of rating table 3"
+help = "Gate openings for each column for rating table 3 for lakes using gate opening routing and nratetbl>2"
+maximum = 20
+minimum = 0
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "inches"
+
+  [tbl_gate3.dims]
+  0 = "ngate3"
+
+[tbl_gate4]
+default = 0
+desc = "Gate openings for each column of rating table 4"
+help = "Gate openings for each column for rating table 4 for lakes using gate opening routing and nratetbl>3"
+maximum = 20
+minimum = 0
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "inches"
+
+  [tbl_gate4.dims]
+  0 = "ngate4"
+
+[tbl_stage]
+default = 5
+desc = "Stage values for each row of rating table 1"
+help = "Stage values for each row for rating table 1 for lakes using gate opening routing and nratetbl>0"
+maximum = 1_000
+minimum = -100
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "feet"
+
+  [tbl_stage.dims]
+  0 = "nstage"
+
+[tbl_stage2]
+default = 5
+desc = "Stage values for each row of rating table 2"
+help = "Stage values for each row for rating table 2 for lakes using gate opening routing and nratetbl>1"
+maximum = 1_000
+minimum = -100
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "feet"
+
+  [tbl_stage2.dims]
+  0 = "nstage2"
+
+[tbl_stage3]
+default = 5
+desc = "Stage values for each row of rating table 3"
+help = "Stage values for each row for rating table 3 for lakes using gate opening routing and nratetbl>2"
+maximum = 1_000
+minimum = -100
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "feet"
+
+  [tbl_stage3.dims]
+  0 = "nstage3"
+
+[tbl_stage4]
+default = 5
+desc = "Stage values for each row of rating table 4"
+help = "Stage values for each row for rating table 4 for lakes using gate opening routing and nratetbl>3"
+maximum = 1_000
+minimum = -100
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "feet"
+
+  [tbl_stage4.dims]
+  0 = "nstage4"
+
+[temp_units]
+default = 0
+desc = "Units flag for measured temperature"
+help = "Flag to indicate the units of measured air-temperature values (0=Fahrenheit; 1=Celsius)"
+maximum = 1
+minimum = 0
+modules = [ "temp_1sta", "temp_laps", "temp_dist2", "temperature_hru" ]
+type = "I"
+units = "none"
+
+  [temp_units.dims]
+  0 = "scalar"
+
+[tmax_adj]
+default = 0
+desc = "HRU maximum temperature adjustment"
+help = "Adjustment to maximum temperature for each HRU, estimated on the basis of slope and aspect"
+maximum = 10
+minimum = -10
+modules = [
+  "temp_1sta",
+  "temp_laps",
+  "temp_dist2",
+  "ide_dist",
+  "xyz_dist"
+]
+type = "F"
+units = "temp_units"
+
+  [tmax_adj.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[tmax_allrain_offset]
+default = 1
+desc = "Precipitation is rain if HRU max temperature >= tmax_allsnow + this value"
+help = "Monthly (January to December) maximum air temperature when precipitation is assumed to be rain; if HRU air temperature is greater than or equal to tmax_allsnow plus this value, precipitation is rain"
+maximum = 50
+minimum = 0
+modules = [
+  "precip_1sta",
+  "precip_laps",
+  "precip_dist2",
+  "precipitation_hru",
+  "convert_params"
+]
+type = "F"
+units = "temp_units"
+
+  [tmax_allrain_offset.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[tmax_allsnow]
+default = 32
+desc = "Maximum temperature when precipitation is all snow"
+help = "Maximum air temperature when precipitation is assumed to be snow; if HRU air temperature is less than or equal to this value, precipitation is snow"
+maximum = 40
+minimum = -10
+modules = [
+  "precip_1sta",
+  "precip_laps",
+  "precip_dist2",
+  "precipitation_hru",
+  "convert_params"
+]
+type = "F"
+units = "temp_units"
+
+  [tmax_allsnow.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[tmax_cbh_adj]
+default = 0
+desc = "Monthly maximum temperature adjustment factor for each HRU"
+help = "Monthly (January to December) adjustment factor to maximum air temperature for each HRU, estimated on the basis of slope and aspect"
+maximum = 10
+minimum = -10
+modules = [ "temperature_hru" ]
+type = "F"
+units = "temp_units"
+
+  [tmax_cbh_adj.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[tmax_index]
+default = 50
+desc = "Monthly index temperature"
+help = "Monthly (January to December) index temperature used to determine precipitation adjustments to solar radiation for each HRU"
+maximum = 110
+minimum = -10
+modules = [ "ddsolrad" ]
+type = "F"
+units = "temp_units"
+
+  [tmax_index.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[tmax_lapse]
+default = 3
+desc = "Monthly maximum temperature lapse rate for each HRU"
+help = "Monthly (January to December) values representing the change in maximum air temperature per 1000 elev_units of elevation change for each HRU"
+maximum = 20
+minimum = -20
+modules = [ "temp_1sta_laps" ]
+type = "F"
+units = "temp_units/elev_units"
+
+  [tmax_lapse.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[tmin_adj]
+default = 0
+desc = "HRU minimum temperature adjustment"
+help = "Adjustment to minimum temperature for each HRU, estimated on the basis of slope and aspect"
+maximum = 10
+minimum = -10
+modules = [
+  "temp_1sta",
+  "temp_laps",
+  "temp_dist2",
+  "ide_dist",
+  "xyz_dist"
+]
+type = "F"
+units = "temp_units"
+
+  [tmin_adj.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[tmin_cbh_adj]
+default = 0
+desc = "Monthly minimum temperature adjustment factor for each HRU"
+help = "Monthly (January to December) adjustment factor to minimum air temperature for each HRU, estimated on the basis of slope and aspect"
+maximum = 10
+minimum = -10
+modules = [ "temperature_hru" ]
+type = "F"
+units = "temp_units"
+
+  [tmin_cbh_adj.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[tmin_lapse]
+default = 3
+desc = "Monthly minimum temperature lapse rate for each HRU"
+help = "Monthly (January to December) values representing the change in minimum air temperture per 1000 elev_units of elevation change for each HRU"
+maximum = 20
+minimum = -20
+modules = [ "temp_1sta_laps" ]
+type = "F"
+units = "temp_units/elev_units"
+
+  [tmin_lapse.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[tosegment]
+default = 0
+desc = "The index of the downstream segment"
+help = "Index of downstream segment to which the segment streamflow flows, for segments that do not flow to another segment enter 0"
+maximum = 1_000_000
+minimum = -11
+modules = [ "routing", "streamflow", "strmflow_in_out", "muskingum" ]
+type = "I"
+units = "none"
+
+  [tosegment.dims]
+  0 = "nsegment"
+
+[tosegment_nhm]
+default = 0
+desc = "National Hydrologic Model downstream segment ID"
+help = "National Model Hydrologic downstream segment ID"
+maximum = 9_999_999
+minimum = 0
+modules = [ "setup_param" ]
+type = "I"
+units = "none"
+
+  [tosegment_nhm.dims]
+  0 = "nsegment"
+
+[transp_beg]
+default = 1
+desc = "Month to begin testing for transpiration"
+help = "Month to begin summing the maximum air temperature for each HRU; when sum is greater than or equal to transp_tmax, transpiration begins"
+maximum = 12
+minimum = 1
+modules = [ "transp_tindex" ]
+type = "I"
+units = "month"
+
+  [transp_beg.dims]
+  0 = "nhru"
+
+[transp_end]
+default = 13
+desc = "Month to stop transpiration period"
+help = "Month to stop transpiration computations; transpiration is computed thru end of previous month"
+maximum = 13
+minimum = 1
+modules = [ "transp_tindex" ]
+type = "I"
+units = "month"
+
+  [transp_end.dims]
+  0 = "nhru"
+
+[transp_tmax]
+default = 1
+desc = "Tmax index to determine start of transpiration"
+help = "Temperature index to determine the specific date of the start of the transpiration period; the maximum air temperature for each HRU is summed starting with the first day of month transp_beg; when the sum exceeds this index, transpiration begins"
+maximum = 1_000
+minimum = 0
+modules = [ "transp_tindex" ]
+type = "F"
+units = "temp_units"
+
+  [transp_tmax.dims]
+  0 = "nhru"
+
+[tsta_elev]
+default = 0
+desc = "Temperature station elevation"
+help = "Elevation of each air-temperature-measurement station"
+maximum = 30_000
+minimum = -300
+modules = [ "temp_1sta", "temp_laps", "temp_dist2" ]
+type = "F"
+units = "elev_units"
+
+  [tsta_elev.dims]
+  0 = "ntemp"
+
+[tsta_xlong]
+default = 0
+desc = "Temperature station longitude, State Plane"
+help = "Longitude of each air-temperature-measurement station, State Plane Coordinate System"
+maximum = 1_000_000_000
+minimum = -1_000_000_000
+modules = [ "temp_dist2" ]
+type = "F"
+units = "feet"
+
+  [tsta_xlong.dims]
+  0 = "ntemp"
+
+[tsta_ylat]
+default = 0
+desc = "Temperature station latitude, State Plane"
+help = "Latitude of each air-temperature-measurement station, State Plane Coordinate System"
+maximum = 1_000_000_000
+minimum = -1_000_000_000
+modules = [ "temp_dist2" ]
+type = "F"
+units = "feet"
+
+  [tsta_ylat.dims]
+  0 = "ntemp"
+
+[tstorm_mo]
+default = 0
+desc = "Set to 1 if thunderstorms prevalent during month for each HRU"
+help = "Monthly flag (January to December) for prevalent storm type for each HRU (0=frontal storms; 1=convective storms)"
+maximum = 1
+minimum = 0
+modules = [ "snowcomp" ]
+type = "I"
+units = "none"
+
+  [tstorm_mo.dims]
+  0 = "nmonth"
+  1 = "nhru"
+
+[va_clos_exp]
+default = 0.001
+desc = "Coefficient in the exponential equation to compute current surface area of closed surface-depression storage"
+help = "Coefficient in the exponential equation relating maximum surface area to the fraction that closed depressions are full to compute current surface area for each HRU; 0.001 is an approximate rectangle; 1.0 is a triangle"
+maximum = 10
+minimum = 0.0001
+modules = [ "srunoff", "srunoff_smidx", "srunoff_carea" ]
+type = "F"
+units = "none"
+
+  [va_clos_exp.dims]
+  0 = "nhru"
+
+[va_open_exp]
+default = 0.001
+desc = "Coefficient in the exponential equation to compute current surface area of open surface-depression storage"
+help = "Coefficient in the exponential equation relating maximum surface area to the fraction that open depressions are full to compute current surface area for each HRU; 0.001 is an approximate rectangle; 1.0 is a triangle"
+maximum = 10
+minimum = 0.0001
+modules = [ "srunoff", "srunoff_smidx", "srunoff_carea" ]
+type = "F"
+units = "none"
+
+  [va_open_exp.dims]
+  0 = "nhru"
+
+[vce]
+default = 0
+desc = "East bank average vegetation crown width"
+help = "East bank average vegetation crown width for each segment"
+maximum = 15
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "meters"
+
+  [vce.dims]
+  0 = "nsegment"
+
+[vcw]
+default = 0
+desc = "West bank vegetation crown width"
+help = "West bank average vegetation crown width for each segment"
+maximum = 15
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "meters"
+
+  [vcw.dims]
+  0 = "nsegment"
+
+[vdemn]
+default = 0
+desc = "Minimum east bank vegetation density"
+help = "Minimum east bank vegetation density for each segment"
+maximum = 1
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "decimal fraction"
+
+  [vdemn.dims]
+  0 = "nsegment"
+
+[vdemx]
+default = 0
+desc = "Maximum east bank vegetation density"
+help = "Maximum east bank vegetation density for each segment"
+maximum = 1
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "decimal fraction"
+
+  [vdemx.dims]
+  0 = "nsegment"
+
+[vdwmx]
+default = 0
+desc = "Maximum west bank vegetation density"
+help = "Maximum west bank vegetation density for each segment"
+maximum = 1
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "decimal fraction"
+
+  [vdwmx.dims]
+  0 = "nsegment"
+
+[vdwmn]
+default = 0
+desc = "Minimum west bank vegetation density"
+help = "Minimum west bank vegetation density for each segment"
+maximum = 0
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "decimal fraction"
+
+  [vdwmn.dims]
+  0 = "nsegment"
+
+[vhe]
+default = 0
+desc = "East bank vegetation height"
+help = "East bank average vegetation height for each segment"
+maximum = 30
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "meters"
+
+  [vhe.dims]
+  0 = "nsegment"
+
+[vhw]
+default = 0
+desc = "West bank vegetation height"
+help = "West bank average vegetation height for each segment"
+maximum = 30
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "meters"
+
+  [vhw.dims]
+  0 = "nsegment"
+
+[voe]
+default = 0
+desc = "East bank vegetation offset"
+help = "East bank vegetation offset for each segment"
+maximum = 100
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "meters"
+
+  [voe.dims]
+  0 = "nsegment"
+
+[vow]
+default = 0
+desc = "West bank vegetation offset"
+help = "West bank vegetation offset for each segment"
+maximum = 100
+minimum = 0
+modules = [ "stream_temp" ]
+type = "F"
+units = "meters"
+
+  [vow.dims]
+  0 = "nsegment"
+
+[weir_coef]
+default = 2.7
+desc = "Broad-crested weir coefficent"
+help = "Coefficient for lakes using broad-crested weir routing"
+maximum = 3
+minimum = 2
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "none"
+
+  [weir_coef.dims]
+  0 = "nlake"
+
+[weir_len]
+default = 5
+desc = "Broad-crested weir length"
+help = "Weir length for lakes using broad-crested weir routing"
+maximum = 1_000
+minimum = 1
+modules = [ "muskingum_lake" ]
+type = "F"
+units = "feet"
+
+  [weir_len.dims]
+  0 = "nlake"
+
+[width_alpha]
+default = 0.015
+desc = "Alpha coefficient in power function for width calculation"
+help = "Alpha coefficient in power function for width calculation"
+maximum = 2
+minimum = 0.0001
+modules = [ "stream_temp" ]
+type = "F"
+units = "unknown"
+
+  [width_alpha.dims]
+  0 = "nsegment"
+
+[width_m]
+default = 0.015
+desc = "M value in power function for width calculation"
+help = "M value in power function for width calculation"
+maximum = 2
+minimum = 0.0001
+modules = [ "stream_temp" ]
+type = "F"
+units = "unknown"
+
+  [width_m.dims]
+  0 = "nsegment"
+
+[wrain_intcp]
+default = 0.1
+desc = "Winter rain interception storage capacity"
+help = "Winter rain interception storage capacity for the major vegetation type in each HRU"
+maximum = 1
+minimum = 0
+modules = [ "intcp" ]
+type = "F"
+units = "inches"
+
+  [wrain_intcp.dims]
+  0 = "nhru"
+
+[x_coef]
+default = 0.2
+desc = "Routing weighting factor"
+help = "The amount of attenuation of the flow wave, called the Muskingum routing weighting factor; enter 0.0 for reservoirs, diversions, and segment(s) flowing out of the basin"
+maximum = 0.5
+minimum = 0
+modules = [ "routing", "streamflow", "muskingum", "muksingum_mann" ]
+type = "F"
+units = "decimal fraction"
+
+  [x_coef.dims]
+  0 = "nsegment"

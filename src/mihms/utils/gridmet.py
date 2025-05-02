@@ -1,8 +1,6 @@
-import os
-
 import pandas as pd
 
-from utils.thredds import GridMet
+from src.mihms.utils.thredds import GridMet
 
 PARAMS = {'precip': 'pr', 'tmin': 'tmmn', 'tmax': 'tmmx'}
 

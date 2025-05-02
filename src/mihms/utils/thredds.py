@@ -20,7 +20,7 @@ warnings.simplefilter(action='ignore', category=DeprecationWarning)
 
 
 class Thredds:
-    """  Unidata's Thematic Real-time Environmental Distributed Data Services (THREDDS)
+    """  Unidata's Thematic Real-time Environmental Distributed data Services (THREDDS)
     
     """
 

@@ -1,9 +1,8 @@
 import json
-from time import sleep
 
 import fiona
 from shapely.geometry import shape
-from utils.elevation import elevation_from_coordinate
+from src.mihms.utils import elevation_from_coordinate
 
 
 def get_gage_stations(basin_shp, gages_shp, out_json):
