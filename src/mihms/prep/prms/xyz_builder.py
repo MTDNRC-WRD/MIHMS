@@ -1,18 +1,20 @@
 import os
 import warnings
 
-import numpy as np
 import geopandas as gpd
-
+import numpy as np
 from gsflow.builder import builder_utils as bu
 from gsflow.prms import PrmsData
 from gsflow.prms.prms_parameter import ParameterRecord
 
-from src.mihms.prep.datafile import write_basin_datafile
-from src.mihms.prep.met_data import met_zones_geometries
-from src.mihms.prep.prms.standard_build import StandardPrmsBuild
+from prep.datafile import write_basin_datafile
+from prep.met_data import met_zones_geometries
+from prep.prms.standard_build import StandardPrmsBuild
+from prep.prms.default_params import get_params
 
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
+
+from prep.prms import NOT_NEEDED_XYZ
 
 
 class XyzDistBuild(StandardPrmsBuild):
@@ -46,8 +48,9 @@ class XyzDistBuild(StandardPrmsBuild):
 
         # if not os.path.exists(self.data_file):
         units = 'metric' if self.cfg.precip_units == 1 else 'standard'
+        out_csv = os.path.join(self.cfg.data_folder, 'inputs.csv')
         new_stations = write_basin_datafile(gages=gages, data_file=self.data_file, stations=stations,
-                                            ghcn_data=self.cfg.data_folder, out_csv=None, units=units,
+                                            ghcn_data=self.cfg.data_folder, out_csv=out_csv, units=units,
                                             return_modified=True)
 
         stations = {k: v for k, v in stations.items() if k in new_stations.keys()}
@@ -99,6 +102,14 @@ class XyzDistBuild(StandardPrmsBuild):
                    ParameterRecord('tsta_y', np.array(tsta_y, dtype=float).ravel(),
                                    dimensions=[['ntemp', len(tsta_y)]], datatype=2),
 
+                   ParameterRecord('tmax_allrain_dist', 1.5,
+                                   dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
+                                   datatype=2),
+
+                   ParameterRecord('tmax_allsnow_dist', 0.0,
+                                   dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
+                                   datatype=2),
+
                    bu.tmax_adj(self.nhru),
 
                    bu.tmin_adj(self.nhru),
@@ -121,15 +132,6 @@ class XyzDistBuild(StandardPrmsBuild):
         self.write_control()
 
     def write_parameters(self):
-
-        if self.cfg.temp_units == 1:
-            allrain_max = np.ones((self.nhru * self.nmonths)) * 3.3
-        else:
-            allrain_max = np.ones((self.nhru * self.nmonths)) * 38.0
-
-        self.data_params.append(ParameterRecord('tmax_allrain_sta', allrain_max,
-                                                dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
-                                                datatype=2))
 
         self.data_params.append(ParameterRecord('dday_intcp', np.ones((self.nhru * self.nmonths)) * -40.0,
                                                 dimensions=[['nhru', self.nhru], ['nmonths', self.nmonths]],
@@ -154,6 +156,8 @@ class XyzDistBuild(StandardPrmsBuild):
         if self.data_params is not None:
             [self.parameters.add_record_object(rec) for rec in self.data_params]
 
+        [self.parameters.remove_record(rec) for rec in NOT_NEEDED_XYZ]
+
         self.parameters.write(self.parameter_file)
 
     def write_control(self):
@@ -177,7 +181,4 @@ class XyzDistBuild(StandardPrmsBuild):
 
 if __name__ == '__main__':
     pass
-
-# Username: david.ketchum@umt.edu
-# Employee Email Address:  david.ketchum@mso.umt.edu
 # ========================= EOF ====================================================================

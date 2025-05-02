@@ -37,6 +37,11 @@ pd.options.mode.chained_assignment = None
 # 105
 # 876
 
+#  32  64  128
+#  16  00  1
+#  8   4   2
+
+
 d8_map = {5: 1, 6: 2, 7: 4, 8: 8, 1: 16, 2: 32, 3: 64, 4: 128}
 
 
@@ -89,8 +94,9 @@ class StandardPrmsBuild:
             self.cascades,
             self.modelgrid,
             self.dem.ravel(),
-            hru_type=self.hru_lakeless.ravel(),
-            hru_subbasin=self.hru_lakeless.ravel())
+            # why are we using 3 (swale) for the model domain edge cells?
+            hru_type=self.hru_type.ravel(),
+            hru_subbasin=self.hru_type.ravel())
 
         self.parameters = builder.build()
 
@@ -119,7 +125,7 @@ class StandardPrmsBuild:
         outlet_sta = self.modelgrid.get_node([(0,) + outlet_sta])
 
         if self.cfg.temp_units == 1:
-            tmax_allrain = np.ones((self.nhru * self.nmonths)) * 3.3
+            tmax_allrain = np.ones((self.nhru * self.nmonths)) * 1.0
             tmax_allsnow = np.ones((self.nhru * self.nmonths)) * 0.0
         else:
             tmax_allrain = np.ones((self.nhru * self.nmonths)) * 38.0
@@ -149,7 +155,7 @@ class StandardPrmsBuild:
         self.control = controlbuild.build(name='{}.control'.format(self.proj_name_res),
                                           parameter_obj=self.parameters)
 
-        self.control.model_mode = ['PRMS']
+        self.control.model_mode = ['PRMS5']
         self.control.executable_desc = ['PRMS Model']
         self.control.executable_model = [self.cfg.prms_exe]
         self.control.cascadegw_flag = [0]
@@ -322,8 +328,8 @@ class StandardPrmsBuild:
             rd_flow_directions[1:-1, -1] = 16
             rd_flow_directions[-1, 1:-1] = 64
 
-            self.flow_direction = rd_flow_directions
-            self.flow_accumulation = rd_flow_accumulation
+            self.flow_direction = np.array(rd_flow_directions)
+            self.flow_accumulation = np.array(rd_flow_accumulation)
 
         elif mode == 'pygsflow':
             # pygsflow flow accumulation and direction
@@ -333,7 +339,7 @@ class StandardPrmsBuild:
                                   self.modelgrid.ycellcenters,
                                   verbose=False)
 
-            self.flow_direction = fa.flow_directions(dijkstra=True, breach=0.001)
+            self.flow_direction = fa.flow_directions(dijkstra=False, breach=0.001)
             self.flow_accumulation = fa.flow_accumulation()
 
         else:
@@ -344,7 +350,7 @@ class StandardPrmsBuild:
             self.dem,
             self.modelgrid.xcellcenters,
             self.modelgrid.ycellcenters,
-            hru_type=self.hru_lakeless,
+            hru_type=self.hru_type,
             flow_dir_array=self.flow_direction,
             verbose=False)
 

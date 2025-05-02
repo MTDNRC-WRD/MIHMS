@@ -33,8 +33,8 @@ def write_basin_datafile(gages, data_file,
 
         df = df.reindex(dt_index)
 
-        if units != 'metric':
-            df = df * 35.3146
+        if units == 'metric':
+            df = df / 35.3146
 
         v['data'] = df
 
@@ -55,14 +55,14 @@ def write_basin_datafile(gages, data_file,
             if not isinstance(df, pd.DataFrame):
                 continue
         else:
-            df = read_csv(_file, parse_dates=True, infer_datetime_format=True, index_col=0)
+            df = read_csv(_file, parse_dates=True, index_col=0)
             df.index = pd.DatetimeIndex(df.index, tz='UTC')
 
         s = v['START']
 
         if to_datetime(start) > to_datetime(s):
             df = df.loc[start:]
-            if df.empty or (df.shape[0] / len(dt_index)) < 0.7:
+            if df.empty or (df.shape[0] / len(dt_index)) < 0.3:
                 print(k, 'insuf records in date range')
                 invalid_stations += 1
                 dropped.append(k)

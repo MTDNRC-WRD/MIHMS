@@ -2,7 +2,12 @@ import os
 from .domain import *
 from .params import *
 
-NOT_NEEDED_XYZ = ['basin_tsta',
+NOT_NEEDED_XYZ = ['subbasin_down',
+                  'soil_moist_init',
+                  'soil_rechr_max',
+                  'soil_rechr_init',
+                  'tmax_allrain',
+                  'basin_tsta',
                   'gvr_cell_pct',
                   'gvr_hru_pct',
                   'hru_psta',
