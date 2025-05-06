@@ -2,3 +2,5 @@
 tri_exe = 'bin/triangle.exe'
 tri_working = 'triangle/wdr_temp'
 gdalwarp_exe = 'bin/gdalwarp.exe'
+default_vars = 'static/prms_output/standard_variables.toml'
+control_defaults = 'static/prms_control_templates/base_defaults.toml'

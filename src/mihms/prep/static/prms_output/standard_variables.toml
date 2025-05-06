@@ -1,0 +1,73 @@
+[basin]
+vars = [
+     'basin_tmin',
+     'basin_tmax',
+     'basin_ppt',
+     'basin_rain',
+     'basin_snow',
+     'basin_net_ppt',
+     'basin_swrad',
+     'basin_intcp_stor',
+     'basin_potet',
+     'basin_actet',
+     'basin_pweqv',
+     'basin_snowmelt',
+     'basin_snowcov',
+     'basin_sroff',
+     'basin_hortonian',
+     'basin_infil',
+     'basin_soil_moist',
+     'basin_recharge',
+     'basin_gwstor',
+     'basin_gwflow',
+     'basin_gwsink',
+     'basin_cfs',
+     'basin_ssflow',
+     'basin_imperv_stor',
+     'basin_lake_stor',
+     'basin_ssstor'
+]
+
+[subbasin]
+vars = [
+    'subinc_precip',
+    'subinc_swrad',
+    'subinc_pkweqv',
+    'subinc_snowcov',
+    'subinc_snowmelt',
+    'subinc_actet',
+    'subinc_potet',
+    'subinc_sroff',
+    'subinc_recharge',
+    'subinc_interflow',
+    'sub_cfs',
+    'subinc_stor'
+]
+
+[hru]
+vars = [
+    'hru_ppt',
+    'swrad',
+    'pkwater_equiv',
+    'snowmelt',
+    'hru_actet',
+    'potet',
+    'infil',
+    'recharge',
+    'soil_moist_tot',
+    'hru_outflow',
+    'hru_storage'
+]
+
+[segment]
+vars = [
+    'seg_inflow',
+    'seg_outflow',
+    'seg_upstream_inflow'
+]
+
+[lake]
+vars = [
+    'lake_inflow',
+    'lake_outflow'
+]

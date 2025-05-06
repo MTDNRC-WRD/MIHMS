@@ -1,0 +1,44 @@
+[cascade_flag]
+value = 1
+datatype = 1
+
+[cascadegw_flag]
+value = 1
+datatype = 1
+
+[et_module]
+value = 'potet_jh'
+datatype = 4
+
+[precip_module]
+value = 'precip_1sta'
+datatype = 4
+
+[snarea_curve_flag]
+value = 0
+datatype = 1
+
+[soilzone_aet_flag]
+value = 1
+datatype = 1
+
+[solrad_module]
+value = 'ddsolrad'
+datatype = 4
+
+[srunoff_module]
+value = 'srunoff_smidx'
+datatype = 4
+
+[strmflow_module]
+value = 'strmflow'
+datatype = 4
+
+[temp_module]
+value = 'temp_1sta'
+datatype = 4
+
+[transp_module]
+value = 'transp_tindex'
+datatype = 4
+
