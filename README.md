@@ -2,14 +2,16 @@
  The Montana Integrated Hydrologic Modeling System code repository.
 
 # Installation
- 
- Use conda to install some choice high-level packages, then run pip install -r requirements.txt
+  Currently must clone and/or download to local directory and install from there.
 
- # conda create -n mihm python=3.9
- # conda activate mihm
- # conda install gdal scipy netcdf4 rasterio
+## Re-create Environment from Prompt
+ conda create -n mihms python=3.10
+ conda activate mihms
+ conda install xarray rasterio geopandas pandas numpy rioxarray dask zarr tomli
 then, manually install remaining high-level packages with pip
- # pip install pygsflow pandas matplotlib dataretrieval fiona rtree shapely pyproj richdem xarray
-alternatively, you can take the frozen requirements from the time of writing this doc:
- # pip install -r requirements.txt
+ pip install flopy pygsflow
+finally use pip to install from url or git:
+ pip install https://github.com/jlarsen-usgs/dany/archive/refs/heads/main.zip
+ pip install git+https://github.com/MTDNRC-WRD/chmdata@main
+ pip install git+https://github.com/MTDNRC-WRD/GRIDtools@main
 Note: the requirements.txt file does not have the conda-installed dependencies listed.
