@@ -14,7 +14,7 @@
 
 then, manually install remaining high-level packages with pip
  
- `pip install flopy pygsflow`
+ `pip install flopy pygsflow spotpy`
 
 finally use pip to install from url or git:
 
