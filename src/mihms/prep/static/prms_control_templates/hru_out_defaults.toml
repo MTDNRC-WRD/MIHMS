@@ -1,0 +1,34 @@
+[nhruOutON_OFF]
+# 0=off; 1=on
+value = 1
+datatype = 1
+
+[nhruOut_format]
+# number format 1=scien not 4 sig-figs; 2=2 decimals; 3=3 decimals; 4=4 decimals; 5=5 decimals
+value = 4
+datatype = 1
+
+[nhruOut_freq]
+# 1=daily; 2=monthly; 3=both; 4=mean monthly; 5=mean yearly; 6=yearly
+value = 3
+datatype = 1
+
+[nhruOutBaseFileName]
+value = 'hru_'
+datatype = 4
+
+[nhruOutVar_names]
+value = [
+    'hru_ppt',
+    'swrad',
+    'pkwater_equiv',
+    'snowmelt',
+    'hru_actet',
+    'potet',
+    'infil',
+    'recharge',
+    'soil_moist_tot',
+    'hru_outflow',
+    'hru_storage'
+]
+datatype = 4

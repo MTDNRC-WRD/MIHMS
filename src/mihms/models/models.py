@@ -1,13 +1,19 @@
 import os
 import json
 from subprocess import Popen, PIPE, STDOUT
+from pathlib import Path
+from typing import Union, Optional
 
 import numpy as np
 import pandas as pd
-
-from gsflow.prms import PrmsData, PrmsParameters
+from gsflow.prms import PrmsData
 from gsflow.control import ControlFile
 from gsflow.output import StatVar
+
+from mihms.prep.prms.params import PRMSParameters
+from mihms.prep.prms.control import ControlBase
+from mihms.prep.utils import write_prms_datafile
+from mihms.utils.io import remove_all_files_in_directory
 
 VAR_UNITS = {'ID': None,
              'runoff': 'cfs',
@@ -68,45 +74,52 @@ OUTPUT_COLS = ['obs_q',
 
 
 class HydroModel:
-    def __init__(selfs):
+    def __init__(self):
         pass
 
 
-class MontanaPrmsModel(HydroModel):
+class PrmsModel(HydroModel):
 
-    def __init__(self, control_file, parameter_file, data_file):
+    def __init__(self, control_file: Union[str, Path, ControlBase]):
         super().__init__()
-        self.control_file = control_file
-        self.parameter_file = parameter_file
-        self.data_file = data_file
+        if isinstance(control_file, ControlBase):
+            self.control_file = control_file.model_wd / control_file.control_filename
+            self.control = control_file
+        else:
+            self.control_file = control_file
+            self.control = ControlBase.load_from_prms_controlfile(self.control_file)
 
-        self.control = ControlFile.load_from_file(control_file)
+        self.parameter_file = self.control.control_obj.get_values('param_file')
+        self.parameters = PRMSParameters.load_paramfile(self.parameter_file)
+        # apparently PrmsData.load_from_file() only accepts one input and cannot process multiple...datafiles which
+        # is not consistent with how PRMS reads in this parameter from the control file (it can take multiple)
+        # This isn't a big deal but should be corrected so it can mimic PRMS control parameter behavior
+        self.data_file = self.control.control_obj.get_values('data_file')[0]
+        self.data = PrmsData.load_from_file(self.data_file)
 
-        if str(self.control.get_record('param_file').values[0]) != self.parameter_file:
-            self.control.param_file = [self.parameter_file]
-            self.control.write()
+    def run_model(self,
+                  stdout: Optional[Union[str, Path]]=None,
+                  write_before: bool = False,
+                  silent: bool = False,
+                  report: bool = True,
+                  clear_rundir: bool = True):
 
-        self.parameters = PrmsParameters.load_from_file(parameter_file)
+        if write_before:
+            self.parameters.pygsflow_param_obj.write()
+            self.control.save_controlfile()
+            write_prms_datafile(self.data, self.data_file)
 
-        self.data = PrmsData.load_from_file(data_file)
-        self.statvar = None
-
-    def run_model(self, stdout=None):
-
-        for obj_, var_ in [(self.control, 'control'),
-                           (self.parameters, 'parameters'),
-                           (self.data, 'data')]:
-            if not obj_:
-                raise TypeError('{} is not set, run "write_{}_file()"'.format(var_, var_))
+        if clear_rundir:
+            remove_all_files_in_directory(self.control._out_pth, recursive=True)
 
         buff = []
         normal_msg = 'normal termination'
-        report, silent = True, False
 
-        argv = [self.control.get_values('executable_model')[0], self.control_file]
+        argv = [self.control.control_obj.get_values('executable_model')[0], self.control_file]
         model_ws = os.path.dirname(self.control_file)
         proc = Popen(argv, stdout=PIPE, stderr=STDOUT, cwd=model_ws)
 
+        success = None
         while True:
             line = proc.stdout.readline()
             c = line.decode('utf-8')
@@ -129,76 +142,6 @@ class MontanaPrmsModel(HydroModel):
                         fp.write(line + '\n')
 
         return success, buff
-
-    def get_statvar(self, snow_obs):
-
-        self.statvar = StatVar.load_from_control_object(self.control)
-        df = self.statvar.stat_df
-        cols = [c.replace('_1', '') for c in df.columns]
-        df.columns = cols
-        df.drop(columns=['Hour', 'Minute', 'Second'], inplace=True)
-
-        # cfs to cms per day
-        if self.control.get_record('runoff_units').values[0] == 0:
-            df['runoff'] = df['runoff'] / 0.028317
-
-        df['runoff'][df['runoff'] < 0.0] = np.nan
-
-        # try to get all the water balance components into MCMS per day
-        df['obs_q'] = 60 * 60 * 24 * df['runoff'] / 1e6
-        df['pred_q'] = 60 * 60 * 24 * df['basin_cms'] / 1e6
-
-        # ppt in inches, hru_area in acres
-        hru_area = self.parameters.get_values('hru_area')[0]
-        hru_active = np.count_nonzero(self.parameters.get_values('hru_type'))
-        # acres to m2
-        basin_area = hru_active * hru_area.item() * 4046.856
-        vols = []
-
-        def inches_to_million_cubic_meters(col_str_):
-            # inches to meters
-            a = df[col_str_] / 39.3701
-            _name = '_'.join(col_str_.split('_')[1:])
-            # to million cubic meters
-            df[_name] = basin_area * a / 1e6
-            vols.append(_name)
-            return None
-
-        basin_vars = self.statvar.statvar_names
-
-        [inches_to_million_cubic_meters(k) for k, v in VAR_UNITS.items() if k in basin_vars and v == 'inches']
-
-        s, e = self.control.get_values('start_time'), self.control.get_values('end_time')
-        try:
-            df.index = pd.date_range('{}-{}-{}'.format(s[0], s[1], s[2]),
-                                     '{}-{}-{}'.format(e[0], e[1], e[2]), freq='D')
-            df.drop(columns=['Year', 'Month', 'Day'], inplace=True)
-        except ValueError:
-            pass
-
-        with open(snow_obs, 'r') as fp:
-            s = json.load(fp)
-
-        s = [(k, v['0']) for k, v in s.items()]
-        s = sorted(s, key=lambda x: x[0])
-        dt = pd.DatetimeIndex([pd.to_datetime(d[0]) for d in s])
-        s = [a[1] for a in s]
-        s = np.array(s) * basin_area / 1e6
-        s = pd.Series(index=dt, data=s, name='swe_obs')
-        df = pd.concat([df, s], axis=1, ignore_index=False)
-
-        # Agrimet data
-        # 0.04184 mj m2-1 per langley
-
-        df = df.loc['2017-01-01': '2017-12-31', OUTPUT_COLS]
-        # df = df[OUTPUT_COLS]
-        self.statvar.stat_df = df
-        return self.statvar.stat_df
-
-
-class prms(HydroModel):
-    def __init__(self):
-        super().__init__()
 
 
 class RivSysModel:

@@ -3283,6 +3283,14 @@ var_category = "mass storage change"
   [seg_stor_change.dims]
   0 = "nsegment"
 
+[seg_upatresm_gwflow]
+desc = "Area-weighted average groundwater flow for each segment from upstream HRUs."
+type = "float64"
+units = "cfs"
+
+  [seg_upstream_gwflow.dims]
+  0 = "nsegment"
+
 [seg_upstream_inflow]
 desc = "Sum of inflow from upstream segments"
 type = "float64"

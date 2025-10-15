@@ -799,7 +799,7 @@ type = "F"
 units = "fraction/day"
 
   [gwflow_coef.dims]
-  0 = "nhru"
+  0 = "ngw"
 
 [gwsink_coef]
 default = 0
@@ -812,7 +812,7 @@ type = "F"
 units = "fraction/day"
 
   [gwsink_coef.dims]
-  0 = "nhru"
+  0 = "ngw"
 
 [gwstor_init]
 default = 2
@@ -825,7 +825,7 @@ type = "F"
 units = "inches"
 
   [gwstor_init.dims]
-  0 = "nhru"
+  0 = "ngw"
 
 [gwstor_min]
 default = 0
@@ -838,7 +838,7 @@ type = "F"
 units = "inches"
 
   [gwstor_min.dims]
-  0 = "nhru"
+  0 = "ngw"
 
 [hamon_coef]
 default = 0.0055
@@ -3034,7 +3034,7 @@ type = "F"
 units = "none"
 
   [ssr2gw_exp.dims]
-  0 = "nhru"
+  0 = "nssr"
 
 [ssr2gw_rate]
 default = 0.1
@@ -3047,7 +3047,7 @@ type = "F"
 units = "fraction/day"
 
   [ssr2gw_rate.dims]
-  0 = "nhru"
+  0 = "nssr"
 
 [ssstor_init_frac]
 default = 0
@@ -3060,7 +3060,7 @@ type = "F"
 units = "decimal fraction"
 
   [ssstor_init_frac.dims]
-  0 = "nhru"
+  0 = "nssr"
 
 [stream_tave_init]
 default = "NaN"

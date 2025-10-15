@@ -1,0 +1,39 @@
+[subbasin_flag]
+value = 1
+datatype = 1
+
+[nsubOutON_OFF]
+# 0=off; 1=on
+value = 1
+datatype = 1
+
+[nsubOut_format]
+# number format 1=scien not 4 sig-figs; 2=2 decimals; 3=3 decimals; 4=4 decimals; 5=5 decimals
+value = 4
+datatype = 1
+
+[nsubOut_freq]
+# 1=daily; 2=monthly; 3=both; 4=mean monthly; 5=mean yearly; 6=yearly
+value = 3
+datatype = 1
+
+[nsubOutBaseFileName]
+value = 'subbasin_'
+datatype = 4
+
+[nsubOutVar_names]
+value = [
+    'subinc_precip',
+    'subinc_swrad',
+    'subinc_pkweqv',
+    'subinc_snowcov',
+    'subinc_snowmelt',
+    'subinc_actet',
+    'subinc_potet',
+    'subinc_sroff',
+    'subinc_recharge',
+    'subinc_interflow',
+    'sub_cfs',
+    'subinc_stor'
+]
+datatype = 4

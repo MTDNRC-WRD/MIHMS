@@ -1,0 +1,44 @@
+[basinOutON_OFF]
+# 0=off; 1=on
+value = 1
+datatype = 1
+
+[basinOut_freq]
+# 1=daily; 2=monthly; 3=both; 4=mean monthly; 5=mean yearly; 6=yearly
+value = 3
+datatype = 1
+
+[basinOutBaseFileName]
+value = 'basin_vars'
+datatype = 4
+
+[basinOutVar_names]
+value = [
+    'basin_tmin',
+     'basin_tmax',
+     'basin_ppt',
+     'basin_rain',
+     'basin_snow',
+     'basin_net_ppt',
+     'basin_swrad',
+     'basin_intcp_stor',
+     'basin_potet',
+     'basin_actet',
+     'basin_pweqv',
+     'basin_snowmelt',
+     'basin_snowcov',
+     'basin_sroff',
+     'basin_hortonian',
+     'basin_infil',
+     'basin_soil_moist',
+     'basin_recharge',
+     'basin_gwstor',
+     'basin_gwflow',
+     'basin_gwsink',
+     'basin_cfs',
+     'basin_ssflow',
+     'basin_imperv_stor',
+     'basin_lake_stor',
+     'basin_ssstor'
+]
+datatype = 4

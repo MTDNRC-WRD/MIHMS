@@ -42,3 +42,6 @@ datatype = 4
 value = 'transp_tindex'
 datatype = 4
 
+[csvON_OFF]
+value = 1
+datatype = 1

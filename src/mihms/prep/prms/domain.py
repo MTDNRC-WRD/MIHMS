@@ -1,12 +1,15 @@
 from pathlib import Path
+import json
+from typing import Union, Optional
+
 import geopandas as gpd
 import pandas as pd
 import numpy as np
+import xarray as xr
 from flopy.utils.triangle import Triangle
 from flopy.utils.voronoi import VoronoiGrid
 from flopy.discretization import VertexGrid as FlopyVertexGrid
-import json
-from typing import Union, Optional
+from gsflow import PrmsData
 
 from mihms.config import project_root, prep
 from mihms.utils.io import NpEncoder
@@ -41,6 +44,111 @@ class PRMSVertexGrid(FlopyVertexGrid):
         with open(pth / flname, 'w') as f:
             json.dump(self.gridprops, f, cls=NpEncoder)
 
+
+def create_obs_dataset(obs_data: pd.DataFrame,
+                       obs_geom: gpd.GeoDataFrame,
+                       col_link: str,
+                       model_grid: Union[str, Path, PRMSVertexGrid, FlopyVertexGrid, gpd.GeoDataFrame],
+                       sub_basins: Optional[np.ndarray] = None,
+                       stream_array: Optional[np.ndarray] = None):
+    """
+
+    Args:
+        obs_data:
+        obs_geom:
+        col_link:
+        model_grid:
+        sub_basins:
+        stream_array:
+
+    Returns:
+
+    """
+    if isinstance(model_grid, (str, Path)):
+        fpgrid = PRMSVertexGrid(model_grid)
+        geom_grid = fpgrid.geo_dataframe
+    elif isinstance(model_grid, (PRMSVertexGrid, FlopyVertexGrid)):
+        geom_grid = model_grid.geo_dataframe
+    elif isinstance(model_grid, gpd.GeoDataFrame):
+        geom_grid = model_grid
+    else:
+        raise ValueError("The input grid object type is not supported.")
+
+    geom_grid['hru'] = geom_grid.index + 1
+
+    # this is to deal with shapefiles...they clip the column headers output by the PRMSCascades class
+    #   the column names should be set as 'hru_subbasin' and 'stream_grid'
+    sub_name = [c for c in geom_grid.columns if 'hru_sub' in c]
+    if len(sub_name) != 0:
+        geom_grid.rename(columns={sub_name[0]: 'hru_subbasin'}, inplace=True)
+        sub_name = True
+    else:
+        sub_name = False
+    strm_name = [c for c in geom_grid.columns if 'stream_g' in c]
+    if len(strm_name) != 0:
+        geom_grid.rename(columns={strm_name[0]: 'stream_grid'}, inplace=True)
+        strm_name = True
+    else:
+        strm_name = False
+
+    if (not sub_name) & (sub_basins is not None):
+        geom_grid['hru_subbasin'] = sub_basins
+        sub_name = True
+
+    if (not strm_name) & (stream_array is not None):
+        geom_grid['stream_grid'] = stream_array
+        strm_name = True
+
+    if 'Date' not in obs_data.columns:
+        raise ValueError(
+            "No date column is included in the input observation data. At least one column must be named 'Date' and have date-like formatted strings or values.")
+
+    df = obs_data.set_index(pd.DatetimeIndex(obs_data['Date']))
+    df.drop(columns='Date', inplace=True)
+
+    if not df.columns.isin(obs_geom[col_link]).all():
+        raise ValueError(
+            "Not all columns in the observation data frame are represented in the geometry file, while the geometry inputs can have more sites than are in the" \
+            "observation data frame, it must at a minimum contain all of the columns. Either check the obs_data input or the col_link argument.")
+
+    obs_geom = obs_geom.loc[obs_geom[col_link].isin(df.columns), :]
+    df = df.loc[:, obs_geom[col_link].to_list()]
+
+    grd_insct = obs_geom.sjoin(geom_grid)
+
+    if strm_name:
+        strm_cells = geom_grid.loc[geom_grid['stream_grid'] != 0, :]
+        strm_insct = obs_geom.sjoin_nearest(strm_cells)
+
+    # get only rows associated with the obs_data columns
+    geom_sel = obs_geom[col_link].isin(df.columns)
+    # change crs to get lat/longs
+    lat_lon_geom = obs_geom.to_crs(4326).geometry
+
+    obs_dset = xr.Dataset(
+        {
+            'observation_data': (['time', 'location'], df.values)
+        },
+        coords={
+            'lon': ('location', lat_lon_geom.x.values[geom_sel]),
+            'lat': ('location', lat_lon_geom.y.values[geom_sel]),
+            'hru': ('location', grd_insct['hru'].values[geom_sel]),
+            'location': ('location', df.columns.values),
+            'time': df.index.values
+        },
+        attrs={'description': "Observation data associated with PRMS model domain."}
+    )
+
+    if sub_name:
+        obs_dset.coords['subbasin'] = ('location', grd_insct['hru_subbasin'].values)
+
+    if strm_name:
+        obs_dset.coords['segment'] = ('location', strm_insct['stream_grid'].values)
+
+    return obs_dset
+
+def append_obs_to_datafile(dfile: Union[str, Path, PrmsData], obsdset: xr.Dataset):
+    raise NotImplementedError("This function is not available yet.")
 
 def voronoi_grid_from_hydrography(
         basin_geom: gpd.GeoDataFrame,
@@ -123,18 +231,23 @@ def voronoi_grid_from_hydrography(
 
     # Determine all overlapping regions created from geometry inputs - sometimes the stream lines buffer overlaps, creating holes that get ingonred by Triangle if not accounted for
     bsn_dif = basin_reg.difference(strm_reg.geometry[0]).explode().reset_index().drop(columns='index')
-    bsn_dif = bsn_dif.difference(lake_reg.geometry[0]).explode().reset_index().drop(columns='index')
-    bsn_dif = gpd.GeoDataFrame({'region': ['basin'] * len(bsn_dif)}, geometry=bsn_dif.geometry,
-                               index=range(0, len(bsn_dif)))
-    strm_dif = strm_reg.difference(lake_reg.geometry[0]).explode().reset_index().drop(columns='index')
-    strm_dif = gpd.GeoDataFrame({'region': ['stream'] * len(strm_dif)}, geometry=strm_dif.geometry)
     if lake_reg is not None:
+        bsn_dif = bsn_dif.difference(lake_reg.geometry[0]).explode().reset_index().drop(columns='index')
+        strm_dif = strm_reg.difference(lake_reg.geometry[0]).explode().reset_index().drop(columns='index')
         lake_dif = lake_reg.difference(strm_reg.geometry[0]).explode().reset_index()
+        bsn_dif = gpd.GeoDataFrame({'region': ['basin'] * len(bsn_dif)}, geometry=bsn_dif.geometry,
+                                   index=range(0, len(bsn_dif)))
+        strm_dif = gpd.GeoDataFrame({'region': ['stream'] * len(strm_dif)}, geometry=strm_dif.geometry)
         lake_dif = gpd.GeoDataFrame({'region': ['lake'] * len(lake_dif)}, geometry=lake_dif.geometry)
-        # concat all the polygon regions into one GeoDataFrame
-        diff_polys = pd.concat([bsn_dif, strm_dif, lake_dif], ignore_index=True)
+        difs = [bsn_dif, strm_dif, lake_dif]
     else:
-        diff_polys = pd.concat([bsn_dif, strm_dif], ignore_index=True)
+        strm_dif = strm_reg
+        bsn_dif = gpd.GeoDataFrame({'region': ['basin'] * len(bsn_dif)}, geometry=bsn_dif.geometry,
+                                   index=range(0, len(bsn_dif)))
+        strm_dif = gpd.GeoDataFrame({'region': ['stream'] * len(strm_dif)}, geometry=strm_dif.geometry)
+        difs = [bsn_dif, strm_dif]
+
+    diff_polys = pd.concat(difs, ignore_index=True)
     # sample a point within each polygon that is used by Triangle to define a refinement region
     diff_pnts = diff_polys.copy()
     diff_pnts['geometry'] = diff_polys.sample_points(1)
@@ -154,10 +267,13 @@ def voronoi_grid_from_hydrography(
     stream_rgdf = gpd.GeoDataFrame(strm_reg)
     stream_rgdf['regID'] = stream_rgdf.index.astype(int)
     stream_rgdf['region'] = 'stream'
-    lakes_rgdf = gpd.GeoDataFrame(lake_reg)
-    lakes_rgdf['regID'] = lakes_rgdf.index.astype(int)
-    lakes_rgdf['region'] = 'lake'
-    reg_gdf = pd.concat([basin_rgdf, stream_rgdf, lakes_rgdf], ignore_index=True)
+    if lake_reg is not None:
+        lakes_rgdf = gpd.GeoDataFrame(lake_reg)
+        lakes_rgdf['regID'] = lakes_rgdf.index.astype(int)
+        lakes_rgdf['region'] = 'lake'
+        reg_gdf = pd.concat([basin_rgdf, stream_rgdf, lakes_rgdf], ignore_index=True)
+    else:
+        reg_gdf = pd.concat([basin_rgdf, stream_rgdf], ignore_index=True)
     reg_gdf.rename(columns={0: 'geometry'}, inplace=True)
     reg_gdf = reg_gdf.set_geometry('geometry')
     # add all refinement regions defined earlier
@@ -218,4 +334,3 @@ def find_undeclared_sinks(fdobject: np.ndarray) -> np.ndarray:
             continue
 
     return sinks
-

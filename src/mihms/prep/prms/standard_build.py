@@ -24,7 +24,7 @@ from gsflow.builder.builder_defaults import ControlFileDefaults
 from gsflow.builder import builder_utils as bu
 from gsflow.prms.prms_parameter import ParameterRecord
 
-from mihms.prep.prms.utils import clip_raster
+from mihms.prep.utils import clip_raster
 
 from mihms.models.model_config import PRMSConfig
 from mihms.models import PRMS_NOT_REQ

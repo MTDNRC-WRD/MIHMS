@@ -1,0 +1,25 @@
+[nsegmentOutON_OFF]
+# 0=off; 1=on
+value = 1
+datatype = 1
+
+[nsegmentOut_format]
+# number format 1=scien not 4 sig-figs; 2=2 decimals; 3=3 decimals; 4=4 decimals; 5=5 decimals
+value = 4
+datatype = 1
+
+[nsegmentOut_freq]
+# 1=daily; 2=monthly; 3=both; 4=mean monthly; 5=mean yearly; 6=yearly
+value = 3
+datatype = 1
+
+[nsegmentOutBaseFileName]
+value = 'segment_'
+datatype = 4
+
+[nsegmentOutVar_names]
+value = [
+    'seg_inflow',
+    'seg_outflow'
+]
+datatype = 4
